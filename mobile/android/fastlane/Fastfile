@@ -1,0 +1,15 @@
+default_platform(:android)
+
+platform :android do
+  desc "Upload an already-built App Bundle to a Play Console track (default: internal)"
+  desc "Run `flutter build appbundle --release` first — this lane only uploads."
+  lane :deploy do |options|
+    upload_to_play_store(
+      track: options[:track] || "internal",
+      aab: options[:aab] || "../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end

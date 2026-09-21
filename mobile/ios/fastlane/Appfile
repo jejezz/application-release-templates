@@ -1,0 +1,3 @@
+app_identifier("__APP_IDENTIFIER__")
+apple_id(ENV["APPLE_ID"]) # only needed for interactive `fastlane match` runs; CI authenticates with the App Store Connect API key instead
+team_id(ENV["APPLE_TEAM_ID"])

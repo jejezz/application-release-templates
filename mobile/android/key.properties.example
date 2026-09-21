@@ -1,0 +1,7 @@
+# Copy this file to `android/key.properties` (git-ignored) for local release
+# builds. Never commit the real file. See release-workflow.md for how to
+# create the keystore this points at.
+storeFile=release.keystore
+storePassword=
+keyAlias=upload
+keyPassword=

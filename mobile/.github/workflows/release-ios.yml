@@ -1,0 +1,58 @@
+name: Release · iOS
+
+# Template — see this template's README (application-release-templates/mobile) for setup and the __PLACEHOLDER__
+# tokens to fill in before this is usable.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: "Override the build number (CFBundleVersion). Leave empty to use pubspec.yaml."
+        required: false
+        type: string
+
+jobs:
+  release:
+    # Use a recent macOS runner so its default Xcode's SDK is new enough for
+    # your plugins' native deps (e.g. connectivity_plus >= 7.1.0 needs the
+    # iOS 26 SDK for NWPath.isUltraConstrained; macos-15 ships an older one).
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Flutter iOS artifacts (unsigned)
+        run: |
+          if [ -n "${{ inputs.build_number }}" ]; then
+            flutter build ios --release --no-codesign --build-number="${{ inputs.build_number }}"
+          else
+            flutter build ios --release --no-codesign
+          fi
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Sign, archive and upload to TestFlight
+        working-directory: ios
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: bundle exec fastlane beta
