@@ -14,7 +14,7 @@
 | [`lib/about/about_dialog.dart`](lib/about/about_dialog.dart) | `lib/about/about_dialog.dart` | [about-dialog.md](../conventions/about-dialog.md) |
 | [`lib/about/extra_licenses.dart`](lib/about/extra_licenses.dart) | `lib/about/extra_licenses.dart` | [licensing.md](../conventions/licensing.md) §2 |
 | [`l10n/common_ko.arb`](l10n/common_ko.arb), [`common_en.arb`](l10n/common_en.arb) | `lib/l10n/app_ko.arb`, `app_en.arb`에 **키를 합침** | [localization.md](../conventions/localization.md) |
-| [`tool/icon/generate_icons.py`](tool/icon/generate_icons.py) | `tool/icon/generate_icons.py` | [icons.md](../conventions/icons.md) |
+| [`tool/icon/generate_icons.py`](tool/icon/generate_icons.py), [`render_svg.swift`](tool/icon/render_svg.swift) | `tool/icon/` | [icons.md](../conventions/icons.md) |
 | [`scripts/bump-version.sh`](scripts/bump-version.sh) | `scripts/bump-version.sh` | [versioning.md](../conventions/versioning.md) §5 |
 | [`tool/readme/`](tool/readme/) | `tool/readme/` | [readme-guide.md](../conventions/readme-guide.md) — README 템플릿(en/ko), `init_readme.py`, `check_readme.py`, `capture.sh`(창 캡처·녹화·GIF), `frame.py` |
 
@@ -56,8 +56,9 @@
        - assets/icon/app_icon.png
        - assets/licenses/
    ```
-5. **아이콘** — 글리프(투명 배경, 512px 이상)를
-   `assets/icon/source_glyph.png`에 두고:
+5. **아이콘** — Icons8 Sticker 글리프 SVG를
+   `assets/icon/source_glyph.svg`에 두고 (PNG면 투명 배경 1024px를
+   `source_glyph.png`로):
    ```bash
    pip3 install pillow
    python3 tool/icon/generate_icons.py
