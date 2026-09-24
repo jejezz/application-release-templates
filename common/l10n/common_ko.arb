@@ -1,0 +1,18 @@
+{
+  "@@locale": "ko",
+  "aboutTooltip": "정보",
+  "aboutVersion": "버전 {version} (빌드 {build})",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutOpenSourceLicenses": "오픈소스 라이선스",
+  "aboutRepository": "GitHub",
+  "commonClose": "닫기"
+}

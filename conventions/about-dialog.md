@@ -65,21 +65,29 @@ daylight와 dove-zip 형식이 가장 완성도가 높으므로 이를 기준으
 
 ### 3. 공통 구현
 
-`templates/common/lib/about_dialog.dart` 하나를 각 앱에 복사하고, 앱마다
-다른 값만 인자로 넘깁니다. (🟡 TODO: dove-zip 구현을 일반화해서 템플릿에
-추가)
+[`common/lib/about/about_dialog.dart`](../common/lib/about/about_dialog.dart)를
+각 앱의 `lib/about/`에 복사하고, 앱마다 다른 문구만 인자로 넘깁니다.
+문자열 키는 [`common/l10n/`](../common/l10n/)의 ARB에서 가져와 앱 ARB에
+합칩니다.
 
 ```dart
 showAppAboutDialog(
   context,
   tagline: l10n.aboutTagline,
   description: l10n.aboutDescription,
-  repositoryUrl: 'https://github.com/jejezz/dove-zip-flutter',
+  features: [l10n.aboutFeatureExtract, l10n.aboutFeatureCompress], // 선택
 );
 ```
 
-저작권자, 라이선스 이름, 아이콘 경로는 `lib/app_identity.dart`의 상수에서
+표시 이름, 저장소 URL, 저작권자, 라이선스 이름, 아이콘 경로는
+[`lib/app_identity.dart`](../common/lib/app_identity.dart)의 상수에서
 읽습니다. identity.md의 값을 앱 코드에 반영하는 곳은 이 파일 하나뿐입니다.
+데스크톱 릴리스 워크플로는 이 파일의 `displayName`이 `AppInfo.xcconfig`의
+`PRODUCT_NAME`과 같은지 검사합니다.
+
+오픈소스 라이선스 화면에 글꼴 같은 비 pub 에셋을 더하는 코드는
+[`common/lib/about/extra_licenses.dart`](../common/lib/about/extra_licenses.dart)에
+있습니다 ([licensing.md](licensing.md) §2).
 
 ### 4. 테스트
 

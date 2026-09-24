@@ -69,5 +69,14 @@ version: 1.5.0-rc.1+40
 3. PR로 `main`에 병합한 뒤, 병합 커밋에 태그를 답니다
    ([tagging.md](tagging.md)).
 
-템플릿 저장소의 `scripts/bump-version.sh <major|minor|patch>`가 1~2단계를
-자동으로 합니다. (🟡 TODO: 스크립트 추가)
+[`common/scripts/bump-version.sh`](../common/scripts/bump-version.sh)를 앱의
+`scripts/`에 복사해 두면 1~2단계를 자동으로 합니다. 태그는 달지 않습니다.
+
+```bash
+scripts/bump-version.sh patch        # 1.4.2+37 -> 1.4.3+38
+scripts/bump-version.sh minor        # 1.4.2+37 -> 1.5.0+38
+scripts/bump-version.sh 1.5.0-rc.1   # 1.4.2+37 -> 1.5.0-rc.1+38
+scripts/bump-version.sh build        # 1.4.2+37 -> 1.4.2+38 (스토어 재제출)
+```
+
+`Cargo.toml`이 있으면 같은 버전으로 함께 올립니다.

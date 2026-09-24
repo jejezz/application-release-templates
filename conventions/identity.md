@@ -54,9 +54,16 @@
 - 형식: `<접두어>.<패키지명에서 _ 뺀 소문자>`, 예: `art.zoomon.dovezip`
 - macOS / iOS `PRODUCT_BUNDLE_IDENTIFIER`, Android `applicationId`,
   Linux `APPLICATION_ID`를 모두 **같은 값**으로 둡니다.
-- 새 앱은 `flutter create --org <접두어> --project-name <패키지명>`으로
-  만들어서 처음부터 맞춥니다. `com.example`이 남아 있으면 첫 릴리스 전에
-  반드시 고칩니다.
+- 새 앱은 `flutter create --org art.zoomon --project-name <패키지명>`으로
+  만듭니다. 이때 Flutter는 플랫폼마다 **다른 형태의 식별자**를 만들므로
+  첫 커밋 전에 하나로 고칩니다.
+  - `sample_app`을 예로 들면, Apple 플랫폼은 `art.zoomon.sampleApp`,
+    Android와 Linux는 `art.zoomon.sample_app`이 됩니다.
+  - 모두 `art.zoomon.sampleapp`으로 바꿉니다. 고칠 곳은 macOS
+    `AppInfo.xcconfig`, iOS `project.pbxproj`, Android
+    `build.gradle.kts`의 `applicationId`와 `namespace`, Linux
+    `CMakeLists.txt`입니다.
+  - `com.example`이 남아 있으면 데스크톱 릴리스 워크플로가 실패합니다.
 
 ### 4. 저작권 문자열 (한 가지 형식)
 
@@ -65,6 +72,8 @@ Copyright © <첫 릴리스 연도> <저작권자>
 ```
 
 `All rights reserved.`는 MIT 라이선스와 맞지 않으므로 붙이지 않습니다.
+Windows 리소스(`Runner.rc`)와 Inno Setup 스크립트는 파일 인코딩 문제를
+피하려고 `©` 대신 `(C)`를 씁니다.
 
 | 위치 | 필드 |
 |---|---|

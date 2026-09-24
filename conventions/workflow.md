@@ -28,14 +28,20 @@
 ### 2. 잡 구조: 검사 → 병렬 빌드 → 한 번에 릴리스
 
 ```
-check-version ──┬─ build-macos ───┐
-                ├─ build-windows ─┼─ release (gh release create)
-                └─ build-linux ───┘
+check ──┬─ build-macos ───┐
+        ├─ build-windows ─┼─ release (태그 푸시일 때만: SHA256SUMS + gh release create)
+        └─ build-linux ───┘
 ```
 
-- **`check-version` 잡은 필수입니다.** dove-zip에서 검증한 잡을 템플릿으로
-  옮깁니다. 태그와 `pubspec.yaml`이 다르면 빌드를 중단합니다. Rust
-  크레이트처럼 다른 매니페스트가 있으면 그 파일도 검사합니다.
+- **검사 잡은 필수입니다.** 데스크톱은 `check`, 모바일은
+  `check-version`이라는 이름입니다. dove-zip에서 검증한 잡을 확장한 것으로,
+  다음 경우 빌드를 중단합니다.
+  - 태그와 `pubspec.yaml` 버전이 다름
+  - `Cargo.toml` 버전이 다름 (파일이 있을 때)
+  - `lib/app_identity.dart`의 `displayName`이 `PRODUCT_NAME`과 다름
+  - 번역이 빠짐 (`l10n.yaml`이 있을 때)
+- 데스크톱 `check` 잡은 표시 이름, 파일 이름, 버전, 프리릴리스 여부를
+  출력하고, 빌드 잡은 이 값으로 산출물 이름을 짓습니다.
 - 모든 플랫폼이 성공했을 때만 `release` 잡이 Release를 만듭니다.
   portside처럼 한 잡이 먼저 Release를 만들고 나머지가 업로드하는 구조는
   쓰지 않습니다. 이 구조에서는 일부 플랫폼 자산만 붙은 릴리스가 남을 수

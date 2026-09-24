@@ -79,12 +79,16 @@ Rust 등 네이티브 코드 때문에 한 아키텍처만 빌드되면(allwinne
 
 - 형식은 `build/linux/x64/release/bundle`을 `<FileName>/` 폴더로 묶은
   tar.gz입니다.
-- 번들 안에 다음 두 파일을 **함께 넣습니다** (지금은 어느 앱도 넣지 않음).
-  - `<FileName>/share/icons/hicolor/256x256/apps/<app-id>.png`
+- 번들 안에 다음 파일을 **함께 넣습니다** (지금은 어느 앱도 넣지 않음).
+  - `<FileName>/share/icons/hicolor/512x512/apps/<app-id>.png`
   - `<FileName>/share/applications/<app-id>.desktop`
-  - `<app-id>`는 [identity.md](identity.md)의 식별자이고, `.desktop`
-    파일 이름은 `APPLICATION_ID`와 같아야 GNOME이 창과 아이콘을
-    연결합니다.
+  - `<FileName>/install.sh`: `~/.local` 아래에 앱, 아이콘, 메뉴 항목을
+    설치합니다. `--remove`로 제거합니다. 원본은
+    [`desktop/linux/install.sh`](../desktop/linux/install.sh)이고, 앱의
+    `linux/install.sh`로 복사해 둡니다.
+  - `<app-id>`는 `linux/CMakeLists.txt`의 `APPLICATION_ID`입니다.
+    `.desktop` 파일 이름이 이 값과 같아야 GNOME이 실행 중인 창과
+    아이콘을 연결합니다. `com.example.*`이 남아 있으면 CI가 실패합니다.
 - AppImage, deb, rpm은 요청이 생길 때 추가합니다.
 
 ### 5. Android / iOS

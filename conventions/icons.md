@@ -29,16 +29,25 @@ assets/icon/
 
 ### 2. 한 스크립트로 모든 플랫폼 생성
 
-`tool/icon/generate_icons.py` 하나로 만듭니다. allwinner와 saturn
-스크립트를 합쳐서 템플릿으로 옮길 예정입니다 (🟡 TODO). 스크립트가 할 일:
+[`common/tool/icon/generate_icons.py`](../common/tool/icon/generate_icons.py)를
+앱의 `tool/icon/`에 복사해서 씁니다. allwinner(macOS, Windows, Linux)와
+saturn(iOS, Android) 스크립트를 합친 것입니다. 앱에 있는 플랫폼 폴더만
+처리합니다.
+
+```bash
+pip3 install pillow
+python3 tool/icon/generate_icons.py
+```
+
+스크립트가 만드는 것:
 
 | 플랫폼 | 산출물 | 형태 |
 |---|---|---|
 | macOS | `macos/Runner/Assets.xcassets/AppIcon.appiconset/` 16~1024 | 1024 캔버스 안 824px 둥근 사각형 판(반경 185, Apple 그리드). 글리프는 판의 약 73% |
-| Windows | `windows/runner/resources/app_icon.ico` (256/128/64/48/32/16) | 판 없이 글리프가 캔버스의 92% |
-| Linux | `linux/runner/resources/app_icon.png` 256px (+ 패키지용 사본) | Windows와 동일 |
+| Windows | `windows/runner/resources/app_icon.ico` (256/128/64/48/32/16) | 캔버스를 꽉 채운 판(모서리 12%) 위에 글리프가 캔버스의 92%. 작업 표시줄에서 macOS 비율의 글리프는 너무 작아 보이기 때문입니다 |
+| Linux | `linux/runner/resources/app_icon.png` 512px. 릴리스 tarball에 이 파일이 들어갑니다 | Windows와 동일 |
 | iOS | `ios/Runner/Assets.xcassets/AppIcon.appiconset/` | 꽉 찬 사각형 판. **알파 채널 제거** (App Store 거부 방지) |
-| Android | 레거시 mipmap + adaptive (`mipmap-anydpi-v26`) | 전경 = 글리프(안전 영역 66% 안), 배경 = 색상 리소스 |
+| Android | 레거시 mipmap + adaptive (`mipmap-anydpi-v26`) | 전경 = 글리프(안전 영역 66% 안), 배경 = 판 그라데이션 이미지 |
 
 ### 3. 판 색상
 

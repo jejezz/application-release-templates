@@ -14,6 +14,14 @@
 > 붙은 항목은 규칙은 정해졌지만 아직 템플릿·공통 패키지로 옮기지 않은
 > 작업입니다.
 
+복사용 파일은 세 폴더에 있습니다.
+
+| 폴더 | 내용 |
+|---|---|
+| [`../common/`](../common/) | 모든 앱: 정보 창, `app_identity.dart`, 추가 라이선스 등록, ARB 키, 아이콘 생성 스크립트, 버전 올림 스크립트 |
+| [`../desktop/`](../desktop/) | macOS/Windows/Linux 릴리스 워크플로, Inno Setup 스크립트, Linux `install.sh`, 릴리스 노트 헤더 |
+| [`../mobile/`](../mobile/) | iOS/Android 릴리스 워크플로, Fastlane |
+
 ## 문서
 
 | 문서 | 다루는 것 |
@@ -44,29 +52,32 @@
    `CMakeLists.txt`의 이름·저작권·ID를 identity.md 값으로 맞춥니다.
    `com.example`이 남아 있으면 안 됩니다.
 3. **LICENSE 추가** — [licensing.md](licensing.md)의 템플릿 그대로.
-4. **아이콘** — 원본을 `assets/icon/`에 두고 생성 스크립트로 모든
-   플랫폼 아이콘을 만듭니다 ([icons.md](icons.md)).
-5. **버전 `0.1.0+1`** 로 시작 ([versioning.md](versioning.md)).
-6. **앱 골격** — 첫 화면을 만들기 전에 아래를 먼저 깝니다.
+4. **공통 파일 복사** — [`../common/`](../common/) README의 순서대로
+   복사합니다. `lib/app_identity.dart`의 자리 표시자를 채웁니다.
+5. **아이콘** — 글리프를 `assets/icon/source_glyph.png`에 두고
+   `python3 tool/icon/generate_icons.py`를 실행합니다 ([icons.md](icons.md)).
+6. **버전 `0.1.0+1`** 로 시작 ([versioning.md](versioning.md)).
+   이후에는 `scripts/bump-version.sh`로 올립니다.
+7. **앱 골격** — 첫 화면을 만들기 전에 아래를 먼저 깝니다.
    - Saturn 테마 토큰과 공통 위젯 ([ui-ux.md](ui-ux.md))
    - SeoulNamsan과 대체 글꼴 ([fonts.md](fonts.md))
    - gen-l10n ko/en과 언어 전환 ([localization.md](localization.md))
    - 시스템/라이트/다크 전환 ([theming.md](theming.md))
    - `window_manager` 창 크기
    - 앱 바 오른쪽 `테마 | 언어 | 정보` 버튼
-7. **정보 창** — [about-dialog.md](about-dialog.md) 형식대로. 버전은
+8. **정보 창** — [about-dialog.md](about-dialog.md) 형식대로. 버전은
    `package_info_plus`로 읽고 코드에 하드코딩하지 않습니다.
-8. **릴리스 워크플로 복사** — 데스크톱은 [`../desktop/`](../desktop/),
+9. **릴리스 워크플로 복사** — 데스크톱은 [`../desktop/`](../desktop/),
    모바일은 [`../mobile/`](../mobile/). 시크릿 등록.
-9. **README / CLAUDE.md** — 앱 저장소 루트의 `CLAUDE.md`에 아래 한 줄을
+10. **README / CLAUDE.md** — 앱 저장소 루트의 `CLAUDE.md`에 아래 한 줄을
    넣어 Claude가 항상 이 규약을 먼저 읽게 합니다.
    ```markdown
    릴리스·버전·패키징·정보 창·아이콘·라이선스·UI/UX·글꼴·언어·테마는
    https://github.com/jejezz/application-release-templates/tree/main/conventions
    규약을 따른다. 이 앱에 적용된 규약 버전: conventions-v1
    ```
-10. **첫 릴리스 `v0.1.0`** 을 태그해서 파이프라인 전체가 한 번 끝까지
-   도는 것을 확인한 뒤 기능 개발을 시작합니다.
+11. **첫 릴리스 `v0.1.0`** 을 태그해서 파이프라인 전체가 한 번 끝까지
+    도는 것을 확인한 뒤 기능 개발을 시작합니다.
 
 ## 규약 버전
 

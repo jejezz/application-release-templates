@@ -12,6 +12,7 @@
 |---|---|---|
 | [`mobile/`](mobile/) | iOS, Android | Fastlane으로 TestFlight / Play 내부 테스트 트랙에 업로드 |
 | [`desktop/`](desktop/) | macOS, Windows, Linux | 태그 푸시 → GitHub Release에 빌드 산출물 직접 첨부 (macOS는 Developer ID 서명 + 공증 포함) |
+| [`common/`](common/) | 모든 앱 | 정보 창, `app_identity.dart`, 아이콘 생성 스크립트, 버전 올림 스크립트 등 플랫폼과 무관한 공통 파일 |
 
 각 폴더의 README가 실제 적용 방법(복사할 파일, 고쳐야 할 자리, 등록할
 시크릿)을 다룹니다. 두 템플릿 모두 최초 도입 시 실제 앱 저장소에서 끝까지
