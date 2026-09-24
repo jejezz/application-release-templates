@@ -119,6 +119,12 @@ class Audit:
             self._lib = '\n'.join(parts)
         return self._lib
 
+    def _own(self, p: Path) -> bool:
+        """A file of the app itself — not build output, tool caches, or another
+        checkout nested inside (e.g. .claude/worktrees/*)."""
+        parts = p.relative_to(self.root).parts
+        return not any(part.startswith('.') or part == 'build' for part in parts)
+
     def git(self, *args: str) -> str:
         try:
             return subprocess.run(['git', '-C', str(self.root), *args], capture_output=True,
@@ -348,7 +354,7 @@ class Audit:
     def packaging(self) -> None:
         a, doc = 'packaging', 'packaging.md'
         if 'windows' in self.platforms:
-            iss_files = [p for p in self.root.rglob('*.iss') if 'build' not in p.relative_to(self.root).parts]
+            iss_files = [p for p in self.root.rglob('*.iss') if self._own(p)]
             iss = iss_files[0].read_text(encoding='utf-8', errors='replace') if iss_files else ''
             if iss_files and iss_files[0].relative_to(self.root).as_posix() != 'installer/windows/app.iss':
                 self.add('packaging.iss-path', a, 'warn', f'installer at {iss_files[0].relative_to(self.root)}',
@@ -372,7 +378,7 @@ class Audit:
                          'installer: ' + ('; '.join(problems) if problems else 'matches the template'),
                          'update from desktop/installer/windows/app.iss — keep the existing AppId GUID' if problems else '', doc,
                          blocks=self.modern and 'windows-x64-setup' not in iss, upgrade=True)
-            if any(p.suffix == '.wxs' for p in self.root.rglob('*.wxs')):
+            if any(self._own(p) for p in self.root.rglob('*.wxs')):
                 self.add('packaging.no-wix', a, 'warn', 'WiX .wxs file present', 'Inno Setup only — delete the .wxs', doc)
         if 'linux' in self.platforms:
             ok = self.exists('linux/install.sh')
