@@ -91,11 +91,18 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "$DISPLAY_NAME $VERSION → $FILE_NAME-$VERSION-* (prerelease: $PRERELEASE)"
 
-      # conventions/readme-guide.md — no leftover TODOs, broken images or
-      # oversized GIFs in a released README.
+      # conventions/readme-guide.md — a real release needs a finished README
+      # (no TODOs, real images). A pre-release tag (vX.Y.Z-rc.N) — e.g. the
+      # first pipeline run before any feature exists — only needs its
+      # structure (tagging.md §1).
       - name: README follows conventions
         if: hashFiles('tool/readme/check_readme.py') != ''
-        run: python3 tool/readme/check_readme.py
+        run: |
+          if [ "${{ steps.meta.outputs.prerelease }}" = "true" ]; then
+            python3 tool/readme/check_readme.py --stage bootstrap
+          else
+            python3 tool/readme/check_readme.py
+          fi
 
       - uses: subosito/flutter-action@v2
         if: hashFiles('l10n.yaml') != ''

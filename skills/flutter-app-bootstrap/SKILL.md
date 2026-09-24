@@ -72,7 +72,9 @@ Then the names and copyright (`identity.md` §2, §4):
   `LegalCopyright "Copyright (C) <year> Jongyun Ahn"`; the window title in
   `windows/runner/main.cpp` and both titles in `linux/runner/my_application.cc`.
 - iOS `CFBundleDisplayName`, Android `android:label`: the display name.
-- `pubspec.yaml`: `version: 0.1.0+1` and a real `description`.
+- `pubspec.yaml`: a real `description`, and `version: 0.1.0-rc.1+1` for
+  desktop (the first tag is the pre-release `v0.1.0-rc.1`) or `0.1.0+1` for
+  mobile (`versioning.md` §2).
 - `LICENSE`: MIT, `Copyright (c) <year> Jongyun Ahn` (`licensing.md` §1).
 
 ## 3. Shared files and skeleton (`common/README.md`)
@@ -115,15 +117,22 @@ Assets:
 - Tell the user which GitHub secrets the platforms need (tables in the
   desktop/mobile READMEs). Registering them is theirs to do.
 
-## 5. README and CLAUDE.md (`readme-guide.md`)
+## 5. README skeleton and CLAUDE.md (`readme-guide.md` "단계별 기준")
 
-`python3 tool/readme/init_readme.py` — it replaces flutter create's README,
-fills names, repository, platforms and minimum macOS, and writes "coming soon"
-placeholder images for the demo GIF and screenshots so the first release
-passes the README check (they stay warnings until real captures replace them
-with `tool/readme/capture.sh`). Fill every `{{TODO}}` from what the user told
-you; keep the screenshot file names (`home.png`, `detail.png`) or rename them
-and run `init_readme.py --placeholders`.
+At this stage the README gets its **structure only** — there is no feature
+to describe or screenshot yet, and writing features before they exist makes a
+README that lies. `python3 tool/readme/init_readme.py` replaces flutter
+create's README and fills everything the repository knows (names, repository,
+badges, platforms, minimum macOS, install table, development, license). Then
+fill only:
+
+- the one-line tagline under the title — from the purpose the user gave;
+- the demo `alt` text if you already know the main flow.
+
+Leave `## Features`, `## How it works`, the screenshots and the demo GIF as
+`{{TODO}}` / "coming soon" placeholders. They're filled when the features are
+built, and the release check requires them before the first real (non-rc)
+release.
 
 Create `CLAUDE.md`: the conventions line from `conventions/README.md` step 10
 (`conventions-v1`), the app's purpose, and anything app-specific the user said.
@@ -132,23 +141,32 @@ Create `CLAUDE.md`: the conventions line from `conventions/README.md` step 10
 
 ```bash
 flutter gen-l10n && flutter analyze && flutter test --reporter=failures-only
-python3 "$T/tools/audit_app.py" .
+python3 "$T/tools/audit_app.py" . --stage bootstrap
 ```
+
+`--stage bootstrap` checks what this stage owns: everything except README
+content (structure only), hardcoded strings and release readiness.
 
 On macOS also `flutter build macos --debug` once — it catches `TEST_HOST`,
 entitlement and plugin problems analyze can't see.
 
-Fix every ❌ the audit reports. Expected leftovers at this stage are only
-warnings: placeholder README images, a temporary glyph, the font license
-notice. List them.
+Fix every ❌ the audit reports — the goal of this stage is zero. Expected
+leftovers are only warnings or notes: a temporary glyph, the font license
+notice, and the README content TODOs. List them.
 
 ## 7. Hand-off
 
 Commit on `main` with a Korean Conventional Commit, e.g.
 `chore: conventions-v1로 <Display Name> 초기 구성`. Creating the GitHub
-repository, pushing, and pushing `v0.1.0` are outward-facing: ask before each.
-Recommend the `v0.1.0` tag soon — proving the whole pipeline before feature
-work is the point of this stage (`conventions/README.md` step 11).
+repository, pushing, and pushing the first tag are outward-facing: ask before
+each. Recommend the first tag soon — proving the whole pipeline before feature
+work is the point of this stage (`conventions/README.md` step 11):
+
+- desktop: `v0.1.0-rc.1` — a GitHub pre-release; CI checks only the README
+  structure for pre-release tags, so the unfinished README is fine.
+- mobile: `v0.1.0` to the internal test track (stores need numeric versions).
 
 Finish with a short Korean summary: what was created, the audit result,
-secrets to register, remaining items (glyph, screenshots, font license, tag).
+secrets to register, remaining items (glyph, font license, first tag), and
+what the README still needs before the first real release (features, how it
+works, screenshots, demo — filled as features land).

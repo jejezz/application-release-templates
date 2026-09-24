@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
 """Audit a Flutter app against conventions/ (read-only).
 
-    python3 tools/audit_app.py <app-dir>                 # markdown report
-    python3 tools/audit_app.py <app-dir> --json          # for scripts / skills
-    python3 tools/audit_app.py <app-dir> --release       # + release-readiness checks
+    python3 tools/audit_app.py <app-dir> --stage bootstrap   # 앱 구현 전
+    python3 tools/audit_app.py <app-dir> --stage release     # 릴리스 직전 (+ git, secrets, verdict)
+    python3 tools/audit_app.py <app-dir> [--stage maintain]  # 기존 앱 정비 (default)
+    … --json                                                 # for scripts / skills
+
+Stages check different things (skills/README.md has the full table):
+
+  bootstrap  the foundation before any feature exists. README is checked for
+             structure only (features, screenshots and demo come later);
+             hardcoded strings and release readiness are not checked. Goal: 0 ❌.
+  release    everything, README complete, plus release readiness (clean tree,
+             commits on origin, version bumped, tag free, secrets) and a
+             verdict: go · bump · hold.
+  maintain   everything except release readiness — the full debt list.
 
 Every check has an id, an area, a status and a fix hint pointing at the
 convention that defines it:
@@ -68,9 +79,11 @@ class Check:
 
 
 class Audit:
-    def __init__(self, root: Path, release: bool):
+    def __init__(self, root: Path, stage: str):
         self.root = root
-        self.release = release
+        self.stage = stage
+        self.release = stage == 'release'
+        self.bootstrap = stage == 'bootstrap'
         self.checks: list[Check] = []
         self.platforms = [p for p in ('macos', 'windows', 'linux', 'ios', 'android') if (root / p).is_dir()]
         self.desktop = [p for p in self.platforms if p in ('macos', 'windows', 'linux')]
@@ -228,6 +241,9 @@ class Audit:
             return
         name, build = m.group(1), int(m.group(2))
         self.add('version.format', a, 'pass', f'pubspec {v}')
+        if self.bootstrap and not self.latest_tag() and not name.startswith('0.1.0'):
+            self.add('version.first', a, 'warn', f'first version is {name}',
+                     'start at 0.1.0-rc.1+1 (desktop) / 0.1.0+1 (mobile)', doc)
 
         tag = self.latest_tag()
         if tag:
@@ -478,7 +494,7 @@ class Audit:
         # Korean string literals left in code — l10n.parity only sees what's already in ARB.
         hard = [h for h in re.findall(r"'[^'\n]*[가-힣][^'\n]*'|\"[^\"\n]*[가-힣][^\"\n]*\"", lib)
                 if h.strip('\'"') != '한국어']  # language names are written in their own language
-        if hard:
+        if hard and not self.bootstrap:
             self.add('l10n.hardcoded', a, 'warn', f'{len(hard)} Korean string literals still in lib/ (not in ARB)',
                      'move UI strings into app_ko.arb / app_en.arb', doc)
         self.add('l10n.resolution', a, 'pass' if 'localeResolutionCallback' in lib else 'fail',
@@ -535,7 +551,9 @@ class Audit:
             return
         checker = self.root / 'tool/readme/check_readme.py'
         if checker.exists():
-            r = subprocess.run(['python3', str(checker)], cwd=self.root, capture_output=True, text=True)
+            # Before features exist only the structure is checked (--stage bootstrap).
+            args = ['python3', str(checker)] + (['--stage', 'bootstrap'] if self.bootstrap else [])
+            r = subprocess.run(args, cwd=self.root, capture_output=True, text=True)
             errors = [l for l in r.stdout.splitlines() if l.startswith('error')]
             warns = [l for l in r.stdout.splitlines() if l.startswith('warning')]
             # The release workflow runs the checker whenever it exists.
@@ -640,14 +658,16 @@ class Audit:
 ICON = {'pass': '✅', 'warn': '⚠️', 'fail': '❌', 'skip': '➖'}
 
 
-def markdown(root: Path, checks: list[Check], platforms: list[str], verdict: str | None = None) -> str:
+def markdown(root: Path, checks: list[Check], platforms: list[str], verdict: str | None = None,
+             stage: str = 'maintain') -> str:
     counts = {s: sum(c.status == s for c in checks) for s in ICON}
     blocking = [c for c in checks if c.blocks_release]
     upgrade = [c for c in checks if c.needed_for_upgrade]
-    lines = [f'# Conventions audit: {root.name}', '',
+    # 🛑 / ⤴ only mean something once an app releases; at bootstrap the goal is 0 ❌.
+    detail = '' if stage == 'bootstrap' else f' (🛑 {len(blocking)} block a release, ⤴ {len(upgrade)} needed for the v1 workflow)'
+    lines = [f'# Conventions audit: {root.name} — stage: {stage}', '',
              f'Platforms: {", ".join(platforms) or "none"} · '
-             f'❌ {counts["fail"]} (🛑 {len(blocking)} block a release, ⤴ {len(upgrade)} needed for the v1 workflow) · '
-             f'⚠️ {counts["warn"]} · ✅ {counts["pass"]}', '']
+             f'❌ {counts["fail"]}{detail} · ⚠️ {counts["warn"]} · ✅ {counts["pass"]}', '']
     if verdict:
         lines += [{'go': '**Release: ✅ go**', 'bump': '**Release: 🟡 bump the version, then go**',
                    'hold': '**Release: 🛑 hold**'}[verdict], '']
@@ -658,7 +678,8 @@ def markdown(root: Path, checks: list[Check], platforms: list[str], verdict: str
             area = c.area
             lines += ['', f'## {area}', '', '| | check | result | fix |', '|---|---|---|---|']
         fix = c.fix + (f' ([doc]({c.doc}))' if c.doc and c.status in ('fail', 'warn') else '')
-        mark = '🛑' if c.blocks_release else '⤴' if c.needed_for_upgrade else ICON[c.status]
+        mark = ICON[c.status] if stage == 'bootstrap' else \
+            '🛑' if c.blocks_release else '⤴' if c.needed_for_upgrade else ICON[c.status]
         lines.append(f'| {mark} | `{c.id}` | {c.message} | {fix if c.status != "pass" else ""} |')
     return '\n'.join(lines) + '\n'
 
@@ -667,19 +688,21 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument('app', type=Path)
     ap.add_argument('--json', action='store_true')
-    ap.add_argument('--release', action='store_true', help='add release-readiness checks (runs git fetch)')
+    ap.add_argument('--stage', choices=('bootstrap', 'release', 'maintain'), default='maintain')
+    ap.add_argument('--release', action='store_true', help='same as --stage release')
     args = ap.parse_args()
+    stage = 'release' if args.release else args.stage
     root = args.app.resolve()
     if not (root / 'pubspec.yaml').exists():
         raise SystemExit(f'{root}: no pubspec.yaml — pass the Flutter app directory')
-    audit = Audit(root, args.release)
+    audit = Audit(root, stage)
     checks = audit.run()
     if args.json:
-        print(json.dumps({'app': str(root), 'platforms': audit.platforms, 'modern_workflow': audit.modern,
-                          'verdict': audit.verdict() if args.release else None,
+        print(json.dumps({'app': str(root), 'stage': stage, 'platforms': audit.platforms, 'modern_workflow': audit.modern,
+                          'verdict': audit.verdict() if audit.release else None,
                           'checks': [asdict(c) for c in checks]}, ensure_ascii=False, indent=1))
     else:
-        print(markdown(root, checks, audit.platforms, audit.verdict() if args.release else None))
+        print(markdown(root, checks, audit.platforms, audit.verdict() if audit.release else None, stage))
     raise SystemExit(1 if any(c.status == 'fail' for c in checks) else 0)
 
 

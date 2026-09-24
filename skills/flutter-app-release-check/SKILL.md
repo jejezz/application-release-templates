@@ -29,10 +29,11 @@ Fetch first, so every later git answer is about the current remote:
 
 ```bash
 git fetch --tags --quiet origin
-python3 "$T/tools/audit_app.py" <app> --release --json
+python3 "$T/tools/audit_app.py" <app> --stage release --json
 ```
 
-`--release` adds release readiness (clean tree, branch, commits not on
+`--stage release` checks everything — including a **finished README** (no
+TODOs, real screenshots; placeholders are warnings) — and adds release readiness (clean tree, branch, commits not on
 origin, version bumped, tag free, and GitHub secrets vs what the workflows
 use). The JSON has `verdict` (`go` · `bump` · `hold`) and per check
 `blocks_release` / `needed_for_upgrade`:
@@ -58,6 +59,11 @@ gh run list --workflow release.yml -L 3          # release-ios.yml / release-and
 
 A failing test or analyzer error blocks the release.
 
+A pre-release tag (`vX.Y.Z-rc.N`) is judged the same way, except that CI
+checks only the README's structure for it (`readme-guide.md` "단계별 기준") —
+so for a pre-release, README content TODOs are not blockers; say so in the
+report.
+
 ## 2. Decide the version
 
 Only when the verdict is `bump` or the version needs choosing. Read the
@@ -70,6 +76,7 @@ doesn't contain; if they disagree, say so and ask before choosing.
 | any `feat` (user-visible new capability) | minor | minor |
 | only `fix` / `perf` / `refactor` / `docs` / `chore` | patch | patch |
 | nothing user-visible at all | ask whether to release | ask |
+| pubspec is a pre-release (`0.1.0-rc.1`) and this is the real release | `bump-version.sh patch` → `0.1.0` | same |
 
 Show the commit list that justifies the choice and let the user pick.
 

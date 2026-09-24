@@ -61,8 +61,8 @@
    복사합니다. `lib/app_identity.dart`의 자리 표시자를 채웁니다.
 5. **아이콘** — 글리프를 `assets/icon/source_glyph.png`에 두고
    `python3 tool/icon/generate_icons.py`를 실행합니다 ([icons.md](icons.md)).
-6. **버전 `0.1.0+1`** 로 시작 ([versioning.md](versioning.md)).
-   이후에는 `scripts/bump-version.sh`로 올립니다.
+6. **버전** — 데스크톱 `0.1.0-rc.1+1`, 모바일 `0.1.0+1`로 시작
+   ([versioning.md](versioning.md)). 이후에는 `scripts/bump-version.sh`로 올립니다.
 7. **앱 골격** — 첫 화면을 만들기 전에 아래를 먼저 깝니다.
    - Saturn 테마 토큰과 공통 위젯 ([ui-ux.md](ui-ux.md))
    - SeoulNamsan과 대체 글꼴 ([fonts.md](fonts.md))
@@ -86,8 +86,10 @@
    https://github.com/jejezz/application-release-templates/tree/main/conventions
    규약을 따른다. 이 앱에 적용된 규약 버전: conventions-v1
    ```
-11. **첫 릴리스 `v0.1.0`** 을 태그해서 파이프라인 전체가 한 번 끝까지
-    도는 것을 확인한 뒤 기능 개발을 시작합니다.
+11. **첫 태그** — 데스크톱은 프리릴리스 `v0.1.0-rc.1`, 모바일은 `v0.1.0`
+    (내부 테스트)을 태그해서 파이프라인 전체가 한 번 끝까지 도는 것을 확인한
+    뒤 기능 개발을 시작합니다 ([tagging.md](tagging.md) §1). README는 이
+    단계에서 구조만 갖추면 됩니다.
 
 ## 규약 버전
 

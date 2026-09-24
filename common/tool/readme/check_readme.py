@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 """Check README.md / README.ko.md against conventions/readme-guide.md.
 
-    python3 tool/readme/check_readme.py
+    python3 tool/readme/check_readme.py                   # release: everything
+    python3 tool/readme/check_readme.py --stage bootstrap # before features exist
+
+--stage bootstrap checks only the structure a README can have before the app
+does anything: both files, the H1, the language switch, the badges, and the
+Install / Development / License sections. Features, "How it works", the demo
+GIF and screenshots are written once there is something to show, so TODOs and
+missing images are not reported. The release workflow uses it for pre-release
+tags (vX.Y.Z-rc.N), the full check for real releases.
 
 Errors (exit 1):
   - a {{TODO…}} / {{PLACEHOLDER}} left from the template
@@ -32,6 +40,8 @@ REQUIRED = {
     'README.md': ['Features', 'Install', 'Development', 'License'],
     'README.ko.md': ['기능', '설치', '개발', '라이선스'],
 }
+# Sections that describe what the app does — not required before it does anything.
+CONTENT_SECTIONS = {'Features', '기능'}
 SWITCH = {'README.md': 'README.ko.md', 'README.ko.md': 'README.md'}
 MAX_BYTES = {'.png': 1_500_000, '.jpg': 1_500_000, '.jpeg': 1_500_000, '.gif': 8_000_000}
 GIF_WARN = 5_000_000
@@ -58,7 +68,7 @@ def display_name() -> str | None:
     return None
 
 
-def check(name: str, errors: list[str], warnings: list[str]) -> None:
+def check(name: str, errors: list[str], warnings: list[str], bootstrap: bool = False) -> None:
     path = ROOT / name
     if not path.exists():
         errors.append(f'{name}: missing (python3 tool/readme/init_readme.py)')
@@ -68,6 +78,9 @@ def check(name: str, errors: list[str], warnings: list[str]) -> None:
 
     for m in re.finditer(r'\{\{[^}]*\}\}', body):
         line = body.count('\n', 0, m.start()) + 1
+        # Before features exist, content TODOs are expected; names/URLs aren't.
+        if bootstrap and m.group(0).startswith('{{TODO'):
+            continue
         errors.append(f'{name}:{line}: template placeholder left: {m.group(0)[:60]}')
 
     h1 = re.search(r'<h1[^>]*>(.*?)</h1>|^# (.+)$', body, re.M)
@@ -79,6 +92,8 @@ def check(name: str, errors: list[str], warnings: list[str]) -> None:
 
     headings = re.findall(r'^## (.+)$', body, re.M)
     for section in REQUIRED[name]:
+        if bootstrap and section in CONTENT_SECTIONS:
+            continue
         if section not in [h.strip() for h in headings]:
             errors.append(f'{name}: missing section "## {section}"')
 
@@ -90,11 +105,16 @@ def check(name: str, errors: list[str], warnings: list[str]) -> None:
     if 'img.shields.io/github/license' not in body:
         errors.append(f'{name}: no license badge')
 
-    targets = re.findall(r'\]\(([^)\s]+)\)', body) + re.findall(r'(?:src|href)="([^"]+)"', body)
+    # Before features exist, links inside a TODO are part of the instructions
+    # ("link docs/ …"), not the README.
+    scan = re.sub(r'\{\{TODO[^}]*\}\}', '', body) if bootstrap else body
+    targets = re.findall(r'\]\(([^)\s]+)\)', scan) + re.findall(r'(?:src|href)="([^"]+)"', scan)
     for target in targets:
         if re.match(r'(https?:|mailto:|#)', target):
             continue
         local = ROOT / target.split('#')[0]
+        if bootstrap and target.startswith('docs/screenshots/'):
+            continue  # captured once there is something to show
         if not local.exists():
             errors.append(f'{name}: broken link {target}')
             continue
@@ -120,17 +140,19 @@ def check(name: str, errors: list[str], warnings: list[str]) -> None:
 
 
 def main() -> None:
+    bootstrap = '--stage' in sys.argv and sys.argv[sys.argv.index('--stage') + 1:][:1] == ['bootstrap']
     errors: list[str] = []
     warnings: list[str] = []
     for name in REQUIRED:
-        check(name, errors, warnings)
+        check(name, errors, warnings, bootstrap)
     for w in warnings:
         print(f'warning  {w}')
     for e in errors:
         print(f'error    {e}')
     if errors:
         sys.exit(1)
-    print(f'ok       README.md, README.ko.md ({len(warnings)} warnings)')
+    stage = ' — structure only (bootstrap)' if bootstrap else ''
+    print(f'ok       README.md, README.ko.md{stage} ({len(warnings)} warnings)')
 
 
 if __name__ == '__main__':

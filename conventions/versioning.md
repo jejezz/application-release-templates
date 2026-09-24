@@ -38,7 +38,12 @@ version: 1.4.2+37
 | PATCH | 버그 수정만 |
 
 `1.0.0` 이전(`0.y.z`)에는 MINOR를 호환이 깨지는 변경에 씁니다.
-첫 공개 릴리스는 `0.1.0`입니다.
+
+시작 버전:
+- 데스크톱: `0.1.0-rc.1+1` — 파이프라인 확인용 첫 태그 `v0.1.0-rc.1`
+  ([tagging.md](tagging.md) §1). 기능이 들어가고 README가 완성되면
+  `scripts/bump-version.sh patch`로 `0.1.0+2`가 되어 첫 정식 릴리스를 냅니다.
+- 모바일: `0.1.0+1`.
 
 ### 3. build number: 앱 전체에서 1씩만 증가, 되돌리지 않음
 
@@ -60,6 +65,12 @@ version: 1.5.0-rc.1+40
 
 태그는 `v1.5.0-rc.1`이고, GitHub Release를 `--prerelease`로 만듭니다
 ([tagging.md](tagging.md)). 정식 버전은 `1.5.0+41`입니다.
+
+macOS·iOS 앱 안의 버전 문자열(`CFBundleShortVersionString`)은 숫자만
+허용되므로 Flutter가 `1.5.0-rc.1`을 `1.5.0.1`로 바꿔 넣습니다. 정보 창에도
+그렇게 보입니다. GitHub Release로 직접 배포하는 데스크톱 앱에는 문제가
+없지만(Flutter 3.47.1, `flutter build macos`로 확인), 스토어에 올리는 모바일
+앱에는 프리릴리스 버전을 쓰지 않습니다.
 
 ### 5. 버전 올리기 절차
 

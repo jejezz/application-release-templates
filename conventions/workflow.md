@@ -40,6 +40,8 @@ check ──┬─ build-macos ───┐
   - `Cargo.toml` 버전이 다름 (파일이 있을 때)
   - `lib/app_identity.dart`의 `displayName`이 `PRODUCT_NAME`과 다름
   - 번역이 빠짐 (`l10n.yaml`이 있을 때)
+  - README가 규칙에 어긋남 (`tool/readme/check_readme.py`가 있을 때).
+    프리릴리스 태그는 구조만, 정식 태그는 전체를 검사합니다
 - 데스크톱 `check` 잡은 표시 이름, 파일 이름, 버전, 프리릴리스 여부를
   출력하고, 빌드 잡은 이 값으로 산출물 이름을 짓습니다.
 - 모든 플랫폼이 성공했을 때만 `release` 잡이 Release를 만듭니다.

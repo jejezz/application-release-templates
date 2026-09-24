@@ -34,8 +34,11 @@ from an unmerged branch means `main` is behind what users run.
 ## 1. Audit
 
 ```bash
-python3 "$T/tools/audit_app.py" <app>
+python3 "$T/tools/audit_app.py" <app> --stage maintain
 ```
+
+`maintain` lists every gap (the full debt list) without release readiness —
+that's the release-check skill's job.
 
 Then read the app's row in `$T/conventions/survey-2026-09.md` ("규약 적용 시
 앱별 할 일") for things the script can't see — but it's a snapshot from
