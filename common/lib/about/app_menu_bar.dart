@@ -4,9 +4,12 @@
 // 한다 (conventions/about-dialog.md §1). macOS가 아니면 child를 그대로 둔다.
 // PlatformMenuBar는 기본 메뉴를 대체하므로 숨기기·종료 같은 표준 항목도
 // 여기서 다시 넣는다.
+//
+// macOS 판별은 dart:io의 Platform.isMacOS가 아니라 defaultTargetPlatform으로
+// 한다 — flutter test는 macOS에서 돌아도 대상 플랫폼이 android라서, 실제 OS로
+// 판별하면 macOS 전용 메뉴 항목이 ArgumentError를 낸다.
 
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../app_identity.dart';
@@ -21,7 +24,7 @@ class AppMenuBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!Platform.isMacOS) return child;
+    if (defaultTargetPlatform != TargetPlatform.macOS) return child;
     final l10n = AppLocalizations.of(context);
     return PlatformMenuBar(
       menus: [
