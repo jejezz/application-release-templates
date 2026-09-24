@@ -91,6 +91,12 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "$DISPLAY_NAME $VERSION → $FILE_NAME-$VERSION-* (prerelease: $PRERELEASE)"
 
+      # conventions/readme-guide.md — no leftover TODOs, broken images or
+      # oversized GIFs in a released README.
+      - name: README follows conventions
+        if: hashFiles('tool/readme/check_readme.py') != ''
+        run: python3 tool/readme/check_readme.py
+
       - uses: subosito/flutter-action@v2
         if: hashFiles('l10n.yaml') != ''
         with:

@@ -11,6 +11,7 @@
 | [`l10n/common_ko.arb`](l10n/common_ko.arb), [`common_en.arb`](l10n/common_en.arb) | `lib/l10n/app_ko.arb`, `app_en.arb`에 **키를 합침** | [localization.md](../conventions/localization.md) |
 | [`tool/icon/generate_icons.py`](tool/icon/generate_icons.py) | `tool/icon/generate_icons.py` | [icons.md](../conventions/icons.md) |
 | [`scripts/bump-version.sh`](scripts/bump-version.sh) | `scripts/bump-version.sh` | [versioning.md](../conventions/versioning.md) §5 |
+| [`tool/readme/`](tool/readme/) | `tool/readme/` | [readme-guide.md](../conventions/readme-guide.md) — README 템플릿(en/ko), `init_readme.py`, `check_readme.py`, `capture.sh`(창 캡처·녹화·GIF), `frame.py` |
 
 ## 적용 순서
 
@@ -65,6 +66,9 @@
    ```
    `aboutTagline`, `aboutDescription`은 앱마다 다른 문구라서 앱 ARB에
    직접 추가합니다.
+8. **README** — `python3 tool/readme/init_readme.py`로 `README.md`와
+   `README.ko.md`를 만들고 `{{TODO}}`를 채웁니다. 스크린샷과 데모 GIF 만드는
+   순서는 [readme-guide.md](../conventions/readme-guide.md)의 "도구" 절에 있습니다.
 
 ## 검증
 

@@ -18,7 +18,7 @@
 
 | 폴더 | 내용 |
 |---|---|
-| [`../common/`](../common/) | 모든 앱: 정보 창, `app_identity.dart`, 추가 라이선스 등록, ARB 키, 아이콘 생성 스크립트, 버전 올림 스크립트 |
+| [`../common/`](../common/) | 모든 앱: 정보 창, `app_identity.dart`, 추가 라이선스 등록, ARB 키, 아이콘 생성 스크립트, 버전 올림 스크립트, README 템플릿과 스크린샷·GIF 도구 |
 | [`../desktop/`](../desktop/) | macOS/Windows/Linux 릴리스 워크플로, Inno Setup 스크립트, Linux `install.sh`, 릴리스 노트 헤더 |
 | [`../mobile/`](../mobile/) | iOS/Android 릴리스 워크플로, Fastlane |
 
@@ -38,6 +38,7 @@
 | [fonts.md](fonts.md) | SeoulNamsan, 대체 글꼴, 고정폭 글꼴, 사용자 콘텐츠 글꼴 |
 | [localization.md](localization.md) | gen-l10n, 한국어 기준 + 영어, 언어 선택 방식, 설정 저장 키, 날짜·숫자 형식 |
 | [theming.md](theming.md) | 시스템/라이트/다크, 색 토큰, 전환 UI, 창 테두리 밝기 |
+| [readme-guide.md](readme-guide.md) | README 구성(MacBroom 기준), 영어·한국어 두 벌, 스크린샷·데모 GIF 규격, 제작·검사 도구 |
 
 ## 새 앱 시작 체크리스트
 
@@ -69,8 +70,12 @@
    `package_info_plus`로 읽고 코드에 하드코딩하지 않습니다.
 9. **릴리스 워크플로 복사** — 데스크톱은 [`../desktop/`](../desktop/),
    모바일은 [`../mobile/`](../mobile/). 시크릿 등록.
-10. **README / CLAUDE.md** — 앱 저장소 루트의 `CLAUDE.md`에 아래 한 줄을
-   넣어 Claude가 항상 이 규약을 먼저 읽게 합니다.
+10. **README / CLAUDE.md**
+   - `python3 tool/readme/init_readme.py`로 README 뼈대를 만듭니다
+     ([readme-guide.md](readme-guide.md)). 스크린샷과 데모 GIF는 첫 화면이
+     나온 뒤 `tool/readme/capture.sh`로 채웁니다.
+   - 앱 저장소 루트의 `CLAUDE.md`에 아래 한 줄을 넣어 Claude가 항상 이
+     규약을 먼저 읽게 합니다.
    ```markdown
    릴리스·버전·패키징·정보 창·아이콘·라이선스·UI/UX·글꼴·언어·테마는
    https://github.com/jejezz/application-release-templates/tree/main/conventions
