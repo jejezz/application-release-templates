@@ -31,6 +31,7 @@
 #endif
 #define MyAppPublisher "Jongyun Ahn"
 #define MyAppURL "https://github.com/jejezz/__REPOSITORY__"
+; The app's first release year — edit it for apps started after 2026.
 #define MyFirstReleaseYear "2026"
 #define SourceDir "..\..\build\windows\x64\runner\Release"
 

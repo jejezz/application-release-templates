@@ -48,8 +48,10 @@ Rust 등 네이티브 코드 때문에 한 아키텍처만 빌드되면(allwinne
   DMG를 `spctl -a -t execute`로 검사해 `Notarized Developer ID`가
   나와야 완료입니다.
 - 볼륨 이름은 표시 이름(공백 허용)입니다.
-- 최소 macOS 버전은 `macos/Podfile`과 Xcode 설정을 같은 값으로 맞추고,
-  릴리스 노트 헤더에 적습니다.
+- 최소 macOS 버전의 원본은 `macos/Runner.xcodeproj/project.pbxproj`의
+  `MACOSX_DEPLOYMENT_TARGET`입니다 (Flutter 3.47은 Swift Package Manager를
+  써서 Podfile이 없을 수 있습니다. Podfile이 있으면 같은 값으로 맞춥니다).
+  이 값을 릴리스 노트 헤더의 `__MIN_MACOS__`에 적습니다.
 - 메뉴바 전용 앱(MacBroom)은 `LSUIElement = true`로 둡니다. 이런 앱도
   정보 창 진입 경로는 필요합니다 ([about-dialog.md](about-dialog.md)).
 
@@ -66,6 +68,8 @@ Rust 등 네이티브 코드 때문에 한 아키텍처만 빌드되면(allwinne
 | `AppPublisher`, `AppPublisherURL`, `AppCopyright` | [identity.md](identity.md) 값 |
 | `OutputBaseFilename` | `{#MyFileName}-{#MyAppVersion}-windows-x64-setup` |
 | `SetupIconFile`, `UninstallDisplayIcon` | 앱 아이콘 |
+| `MyFirstReleaseYear` | 첫 릴리스 연도 (2026이 아닌 해에 시작한 앱은 고칩니다) |
+| `[InstallDelete]` | 예전 설치 프로그램이 다른 위치(시작 메뉴 폴더 등)에 만든 바로가기를 지웁니다. 템플릿으로 바꾸는 기존 앱만 필요합니다 |
 | `[Languages]` | `english` + `korean`. 설치 프로그램 문구는 이 파일의 번역을 따르고 `.iss`에 한국어를 하드코딩하지 않습니다 |
 
 - 설치 위치는 `{autopf}\<표시 이름>`입니다.

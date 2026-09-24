@@ -26,8 +26,9 @@ UI 아이콘은 [icons.md](icons.md)에서 다룹니다. 이 문서는 그 위�
 
 ### 1. 디자인 언어는 하나: Saturn
 
-- 새 앱은 Saturn 디자인 언어를 씁니다. 기준 구현은 **daylight의
-  `app_theme.dart`와 dove가 더한 부분을 합친 것**입니다.
+- 새 앱은 Saturn 디자인 언어를 씁니다. 기준 구현은
+  [`common/lib/theme/app_theme.dart`](../common/lib/theme/app_theme.dart)입니다
+  (daylight → dove-zip의 테마를 이 문서와 theming.md에 맞게 정리한 것).
 - `useMaterial3: true`로 두고 Material 컴포넌트를 씁니다. 모양은 테마에서
   덮어씁니다.
 - 예외: 메뉴바 전용 macOS 유틸리티(MacBroom 유형)는 `macos_ui`를 써도
@@ -46,8 +47,10 @@ dependencies:
     git: { url: https://github.com/jejezz/zoomon-ui-flutter, ref: v1.0.0 }
 ```
 
-패키지가 생기기 전까지는 dove-zip의 `lib/presentation/theme/`를 원본으로
-보고 복사하며, 복사한 파일 첫 줄에 출처를 적습니다.
+패키지가 생기기 전까지는 [`common/lib/`](../common/lib/)의 `theme/`,
+`settings/`, `about/`을 복사합니다. 파일 첫 줄의 출처 주석은 그대로
+둡니다. 연결 방법은 [`common/lib/main.dart`](../common/lib/main.dart)가 보여
+줍니다.
 
 ### 3. 토큰 값
 
@@ -78,8 +81,9 @@ dependencies:
   const WindowOptions(size: Size(1200, 720), minimumSize: Size(960, 600),
       center: true, title: '<표시 이름>');
   ```
-- 기본 크기는 앱마다 정하되, 최소 크기는 **960×600 이하**로 둡니다
-  (1366×768 노트북에서 잘리지 않도록).
+- 기본 크기: 목록·편집기 같은 작업 앱은 1200×720, 작은 유틸리티는
+  960×640. 최소 크기는 **960×600 이하**로 둡니다 (1366×768 노트북에서
+  잘리지 않도록).
 - 마지막 창 크기와 위치를 기억하는 것은 선택 사항입니다.
 - 제목 표시줄은 OS 기본을 씁니다. 창 테두리 색을 테마와 맞추는 방법은
   [theming.md](theming.md)에 있습니다.

@@ -73,8 +73,14 @@ fi
 git add "${FILES[@]}"
 git commit -q -m "chore(release): v$NAME"
 
+DISPLAY=$(grep -m1 "displayName = '" lib/app_identity.dart "$(dirname "$PUBSPEC")/lib/app_identity.dart" 2>/dev/null \
+  | sed -E "s/.*displayName = '([^']+)'.*/\1/" | head -1 || true)
+[ -n "$DISPLAY" ] || DISPLAY=$(grep -m1 '^PRODUCT_NAME' "$(dirname "$PUBSPEC")/macos/Runner/Configs/AppInfo.xcconfig" 2>/dev/null \
+  | sed -E 's/^PRODUCT_NAME[[:space:]]*=[[:space:]]*//' || true)
+[ -n "$DISPLAY" ] || DISPLAY="<Display Name>"
+
 echo "$CURRENT -> $NEW  (committed: chore(release): v$NAME)"
 echo
 echo "Next: push, merge the PR, then tag the merge commit on main:"
 echo "  git switch main && git pull"
-echo "  git tag -a v$NAME -m \"<Display Name> $NAME\" && git push origin v$NAME"
+echo "  git tag -a v$NAME -m \"$DISPLAY $NAME\" && git push origin v$NAME"

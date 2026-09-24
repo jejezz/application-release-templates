@@ -3,6 +3,9 @@
 
     python3 tool/readme/init_readme.py            # refuses to overwrite
     python3 tool/readme/init_readme.py --force    # replace existing READMEs
+    python3 tool/readme/init_readme.py --placeholders   # only (re)create missing images
+
+flutter create's own README.md is replaced without --force.
 
 Fills in everything the repository already knows:
 
@@ -49,13 +52,16 @@ def display_name() -> str:
 
 
 def repo_slug() -> str:
+    # The git remote, else AppIdentity.repositoryUrl (filled before the
+    # GitHub repository exists).
     try:
         url = subprocess.run(['git', 'remote', 'get-url', 'origin'], cwd=ROOT,
                              capture_output=True, text=True, check=True).stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
-        return '{{TODO: owner/repo}}'
-    m = re.search(r'github\.com[:/](.+?)(?:\.git)?$', url)
-    return m.group(1) if m else '{{TODO: owner/repo}}'
+        url = ''
+    m = (re.search(r'github\.com[:/](.+?)(?:\.git)?$', url)
+         or re.search(r"repositoryUrl\s*=\s*'https://github\.com/([^'/]+/[^'/]+)'", read('lib/app_identity.dart')))
+    return m.group(1) if m and '__' not in m.group(1) else '{{TODO: owner/repo}}'
 
 
 def platforms() -> list[str]:
@@ -90,8 +96,61 @@ def keep_blocks(text: str, enabled: set[str]) -> str:
     return re.sub(r'\n{3,}', '\n\n', ''.join(out))
 
 
+PLACEHOLDER_TAG = 'readme-placeholder'
+
+
+def placeholder_media(name: str) -> None:
+    """Write "coming soon" images for every docs/screenshots/* the README
+    references but that don't exist yet, so the README renders and the release
+    check passes before the first capture. They carry a marker that
+    check_readme.py reports as a warning until they're replaced."""
+    try:
+        from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
+    except ImportError:
+        print('note     Pillow missing — no placeholder images (pip3 install pillow)')
+        return
+    icon_path = ROOT / 'assets/icon/app_icon.png'
+    for readme in TARGETS.values():
+        text = (ROOT / readme).read_text(encoding='utf-8') if (ROOT / readme).exists() else ''
+        for rel in sorted(set(re.findall(r'src="(docs/screenshots/[^"{}]+)"', text))):
+            out = ROOT / rel
+            if out.exists():
+                continue
+            out.parent.mkdir(parents=True, exist_ok=True)
+            w, h = (760, 480) if out.suffix == '.gif' else (1200, 760)
+            img = Image.new('RGB', (w, h), (0x15, 0x1D, 0x27))
+            draw = ImageDraw.Draw(img)
+            size = 160 if out.suffix != '.gif' else 120
+            if icon_path.exists():
+                icon = Image.open(icon_path).convert('RGBA').resize((size, size))
+                img.paste(icon, ((w - size) // 2, h // 2 - size + 10), icon)
+            try:
+                font = ImageFont.load_default(size=40 if out.suffix != '.gif' else 30)
+            except TypeError:  # Pillow < 10.1
+                font = ImageFont.load_default()
+            for i, (line, color) in enumerate(((name, (0xF1, 0xF5, 0xF9)), ('Screenshot coming soon', (0xA9, 0xB4, 0xC4)))):
+                box = draw.textbbox((0, 0), line, font=font)
+                draw.text(((w - box[2]) // 2, h // 2 + 40 + i * (box[3] + 16)), line, fill=color, font=font)
+            if out.suffix == '.gif':
+                img.save(out, comment=PLACEHOLDER_TAG.encode())
+            else:
+                info = PngImagePlugin.PngInfo()
+                info.add_text(PLACEHOLDER_TAG, '1')
+                img.save(out, pnginfo=info)
+            print(f'wrote    {rel} (placeholder — replace with tool/readme/capture.sh)')
+
+
+def is_flutter_default(path: Path) -> bool:
+    return path.exists() and 'A new Flutter project.' in path.read_text(encoding='utf-8')
+
+
 def main() -> None:
     force = '--force' in sys.argv[1:]
+    if '--placeholders' in sys.argv[1:]:
+        # After renaming screenshots in the README: make placeholders for
+        # whatever it now references that doesn't exist yet.
+        placeholder_media(display_name())
+        return
     plats = platforms()
     if not plats:
         raise SystemExit('no platform folders found — run from a Flutter app')
@@ -116,7 +175,8 @@ def main() -> None:
 
     for template, target in TARGETS.items():
         out = ROOT / target
-        if out.exists() and not force:
+        # flutter create's README is replaced without asking.
+        if out.exists() and not force and not is_flutter_default(out):
             print(f'skip     {target} (exists — use --force to replace)')
             continue
         text = keep_blocks((HERE / template).read_text(encoding='utf-8'), enabled)
@@ -125,6 +185,7 @@ def main() -> None:
         out.write_text(text, encoding='utf-8')
         todos = len(re.findall(r'\{\{TODO', text))
         print(f'wrote    {target} ({todos} TODOs to fill)')
+    placeholder_media(name)
 
 
 if __name__ == '__main__':

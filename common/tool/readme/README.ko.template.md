@@ -36,8 +36,8 @@
 - **라이트·다크, 한국어·English** — 시스템 설정을 따르거나 툴바에서 고를 수 있습니다
 
 <p align="center">
-  <img src="docs/screenshots/{{TODO: screen-1}}.png" width="360" alt="{{TODO: 화면 1}}">
-  <img src="docs/screenshots/{{TODO: screen-2}}.png" width="360" alt="{{TODO: 화면 2}}">
+  <img src="docs/screenshots/home.png" width="360" alt="{{TODO: 화면 1}}">
+  <img src="docs/screenshots/detail.png" width="360" alt="{{TODO: 화면 2}}">
 </p>
 
 ## 설치
@@ -48,7 +48,7 @@
 | OS | 파일 |
 |---|---|
 <!-- if:macos -->
-| macOS {{MIN_MACOS}} 이상 | `{{FILE_NAME}}-<버전>-macos-universal.dmg` — 열어서 {{DISPLAY_NAME}}을(를) Applications로 끌어다 놓으세요 |
+| macOS {{MIN_MACOS}} 이상 | `{{FILE_NAME}}-<버전>-macos-universal.dmg` — 열어서 앱을 Applications 폴더로 끌어다 놓으세요 |
 <!-- endif:macos -->
 <!-- if:windows -->
 | Windows 10/11 (x64) | `{{FILE_NAME}}-<버전>-windows-x64-setup.exe` |

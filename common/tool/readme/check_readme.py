@@ -12,6 +12,8 @@ Errors (exit 1):
   - an image over the size limit (PNG/JPG 1.5 MB, GIF 8 MB)
 
 Warnings:
+  - a "coming soon" placeholder image from init_readme.py not yet replaced
+    by a real capture (fine for the first releases, not for long)
   - a GIF over 5 MB (slow first paint on GitHub)
   - a versioned file name like Foo-1.2.3.dmg (goes stale — write <version>
     and link releases/latest instead)
@@ -33,6 +35,16 @@ REQUIRED = {
 SWITCH = {'README.md': 'README.ko.md', 'README.ko.md': 'README.md'}
 MAX_BYTES = {'.png': 1_500_000, '.jpg': 1_500_000, '.jpeg': 1_500_000, '.gif': 8_000_000}
 GIF_WARN = 5_000_000
+PLACEHOLDER_TAG = 'readme-placeholder'
+
+
+def is_placeholder(path: Path) -> bool:
+    try:
+        from PIL import Image
+        with Image.open(path) as img:
+            return PLACEHOLDER_TAG in img.info or img.info.get('comment', b'') == PLACEHOLDER_TAG.encode()
+    except Exception:
+        return False
 
 
 def display_name() -> str | None:
@@ -86,6 +98,8 @@ def check(name: str, errors: list[str], warnings: list[str]) -> None:
         if not local.exists():
             errors.append(f'{name}: broken link {target}')
             continue
+        if local.suffix.lower() in MAX_BYTES and is_placeholder(local):
+            warnings.append(f'{name}: {target} is still a placeholder — capture it with tool/readme/capture.sh')
         limit = MAX_BYTES.get(local.suffix.lower())
         size = local.stat().st_size
         if limit and size > limit:

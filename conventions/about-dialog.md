@@ -21,7 +21,7 @@ daylight와 dove-zip 형식이 가장 완성도가 높으므로 이를 기준으
 | 플랫폼 | 진입 경로 |
 |---|---|
 | 데스크톱 (공통) | 메인 화면 AppBar 오른쪽 끝의 `info` 아이콘 버튼. 툴팁 "정보" / "About" |
-| macOS 추가 | 앱 메뉴의 "About <표시 이름>" 항목이 **같은 대화상자**를 엽니다. `PlatformMenuBar`로 연결하거나, `MainMenu.xib`의 기본 About 항목을 채널로 연결합니다 |
+| macOS 추가 | 앱 메뉴의 "About <표시 이름>" 항목이 **같은 대화상자**를 엽니다. [`common/lib/about/app_menu_bar.dart`](../common/lib/about/app_menu_bar.dart)로 감쌉니다 (`MaterialApp.builder`) |
 | 메뉴바 전용 앱 | 트레이 메뉴에 "About <표시 이름>" 항목 |
 | 모바일 | 설정 화면 맨 아래 "앱 정보" 섹션. 행을 누르면 같은 내용의 전체 화면 페이지 |
 
@@ -60,8 +60,10 @@ daylight와 dove-zip 형식이 가장 완성도가 높으므로 이를 기준으
 - 너비는 최대 440입니다. 내용이 넘치면 스크롤합니다.
 - "Built with Flutter (Dart)" 같은 줄은 넣지 않습니다. 오픈소스 라이선스
   페이지가 그 역할을 합니다.
-- 모든 문자열은 l10n(ko 기본 + en)으로 관리합니다. 앱에 l10n이 없으면
-  한국어로 씁니다.
+- 모든 문자열은 l10n(ko 기본 + en)으로 관리합니다. 공통 정보 창은 생성된
+  `AppLocalizations`를 쓰므로, **l10n이 없는 앱은 최소 설정(`l10n.yaml`,
+  `common/l10n/`의 키, `localeResolutionCallback`)을 먼저** 합니다. 나머지
+  화면의 문자열 이전은 나중에 해도 됩니다.
 
 ### 3. 공통 구현
 
@@ -79,7 +81,11 @@ showAppAboutDialog(
 );
 ```
 
-표시 이름, 저장소 URL, 저작권자, 라이선스 이름, 아이콘 경로는
+표시 이름, 저장소 URL, 앱 고유의 정보 창 코드(문구 모음, 추가 버튼)는 복사한 파일을 고치지 말고
+`lib/about/<앱>_about.dart`에 둡니다. 공통 파일은 템플릿과 같게 유지해야
+다음 갱신 때 그대로 덮어쓸 수 있습니다.
+
+저작권자, 라이선스 이름, 아이콘 경로는
 [`lib/app_identity.dart`](../common/lib/app_identity.dart)의 상수에서
 읽습니다. identity.md의 값을 앱 코드에 반영하는 곳은 이 파일 하나뿐입니다.
 데스크톱 릴리스 워크플로는 이 파일의 `displayName`이 `AppInfo.xcconfig`의

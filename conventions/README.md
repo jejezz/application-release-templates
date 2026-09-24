@@ -79,7 +79,8 @@
      ([readme-guide.md](readme-guide.md)). 스크린샷과 데모 GIF는 첫 화면이
      나온 뒤 `tool/readme/capture.sh`로 채웁니다.
    - 앱 저장소 루트의 `CLAUDE.md`에 아래 한 줄을 넣어 Claude가 항상 이
-     규약을 먼저 읽게 합니다.
+     규약을 먼저 읽게 합니다. 일부 영역만 적용했다면 버전 뒤에 남은 영역을
+     적습니다: `conventions-v1 (미적용: 아이콘, l10n·테마, README)`.
    ```markdown
    릴리스·버전·패키징·정보 창·아이콘·라이선스·UI/UX·글꼴·언어·테마는
    https://github.com/jejezz/application-release-templates/tree/main/conventions

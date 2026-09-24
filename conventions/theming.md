@@ -48,19 +48,22 @@
 | `accent` (`secondary`) | `#7C5CFF` | `#7C5CFF` | 보조 강조 |
 | `textHi` | `#F1F5F9` | `#101828` | 본문 |
 | `textMid` | `#A9B4C4` | `#5B6676` | 보조 텍스트 |
-| `textLow` | `#6B7787` | (미정) | 비활성, 힌트 |
+| `textLow` | `#6B7787` | `#8A94A6` | 비활성, 힌트 |
 | `success` | `#34D399` | `#34D399` | 완료, 연결됨 |
 | `warning` | `#FFB020` | `#FFB020` | 주의 |
 | `error` (`danger`) | `#FF5A5F` | `#FF5A5F` | 오류, 위험 버튼 |
 
 값은 daylight `app_theme.dart`(origin/main)에서 가져왔습니다.
 
-- 지금은 의미 색(success, warning, error)을 라이트에서도 다크와 같은 값으로
-  씁니다. 아이콘과 점 표시에는 괜찮습니다. 하지만 **흰 배경 위 글자색으로
-  쓰면 대비가 부족합니다** (특히 `warning` `#FFB020`).
-  - 🟡 TODO: 라이트용 글자색 변형(`successText`, `warningText`,
-    `errorText`)을 명도 대비 4.5:1 이상으로 정하고, 라이트 `textLow`도
-    정합니다.
+- 의미 색(success, warning, error)은 아이콘·점·배경에 두 테마 공통으로
+  씁니다. **흰 배경 위 글자색**으로는 대비가 부족하므로(특히 `warning`
+  `#FFB020`) 라이트 테마에서는 글자용 변형을 씁니다: `successTextLight`
+  `#047857`, `warningTextLight` `#B45309`, `dangerTextLight` `#C81E24`
+  (라이트 테마의 `colorScheme.error`).
+- 기준 구현: [`common/lib/theme/app_theme.dart`](../common/lib/theme/app_theme.dart).
+  `ColorScheme`의 모든 슬롯(`onSurfaceVariant`, `outline`,
+  `surfaceContainerHighest` 등)을 채웁니다. 비워 두면 Material 기본값이
+  들어가 팔레트와 어긋납니다.
 
 - 위젯에서 `Color(0x...)`를 직접 쓰지 않습니다. 반드시
   `Theme.of(context).colorScheme`이나 `AppColors.of(context)`를 거칩니다.
@@ -71,6 +74,9 @@
 
 [localization.md](localization.md)의 언어 전환과 **같은 방식**으로 만듭니다.
 
+- 기준 구현: [`common/lib/settings/`](../common/lib/settings/) —
+  `AppSettings`(저장·이전·언어 해석), `ThemeMenuButton`,
+  `LanguageMenuButton`, 모바일용 `*SegmentedButton`.
 - **데스크톱**: 앱 바 아이콘을 누르면 체크 표시가 있는 팝업 메뉴가 열리고,
   항목은 `시스템 설정 따르기`, `라이트`, `다크`입니다.
   - 아이콘은 현재 모드를 보여줍니다: `brightness_auto` / `light_mode` /

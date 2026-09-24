@@ -64,6 +64,13 @@
     `build.gradle.kts`의 `applicationId`와 `namespace`, Linux
     `CMakeLists.txt`입니다.
   - `com.example`이 남아 있으면 데스크톱 릴리스 워크플로가 실패합니다.
+- 표시 이름(`PRODUCT_NAME`)을 바꾸면 **함께 고칠 곳**:
+  - `macos/Runner.xcodeproj/project.pbxproj`의 RunnerTests `TEST_HOST`
+    (빌드 구성 3개). 옛 앱 이름을 가리키면 Xcode 테스트 타깃이 깨집니다.
+  - `windows/runner/Runner.rc`의 `FileDescription`, `ProductName`
+    (작업 관리자에 보이는 이름), `windows/runner/main.cpp`의 창 제목,
+    `linux/runner/my_application.cc`의 GTK 제목. 실행 중에는
+    `window_manager`가 덮어쓰지만 파일에도 맞춰 둡니다.
 
 ### 4. 저작권 문자열 (한 가지 형식)
 

@@ -36,8 +36,8 @@
 - **Light & dark, English & 한국어** — follows the system, or pick one in the toolbar
 
 <p align="center">
-  <img src="docs/screenshots/{{TODO: screen-1}}.png" width="360" alt="{{TODO: screen 1}}">
-  <img src="docs/screenshots/{{TODO: screen-2}}.png" width="360" alt="{{TODO: screen 2}}">
+  <img src="docs/screenshots/home.png" width="360" alt="{{TODO: screen 1}}">
+  <img src="docs/screenshots/detail.png" width="360" alt="{{TODO: screen 2}}">
 </p>
 
 ## Install
