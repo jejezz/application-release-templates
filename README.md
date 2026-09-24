@@ -1,5 +1,9 @@
 # Application Release Templates
 
+> 버전·태그·패키징·정보 창·아이콘·라이선스 등 **모든 앱이 따라야 할 공통 규약**은
+> [`conventions/`](conventions/)에 있습니다. 새 앱은 기능 구현 전에
+> [새 앱 시작 체크리스트](conventions/README.md#새-앱-시작-체크리스트)부터 끝내십시오.
+
 여러 Flutter 앱에 그대로 옮겨 쓸 수 있게 일반화한 GitHub Actions 릴리스
 워크플로 템플릿 모음입니다. 배포 방식이 근본적으로 다른 두 그룹으로
 나뉩니다.
