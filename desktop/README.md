@@ -75,6 +75,16 @@ build macos --release`가 만드는 애드혹(ad-hoc) 서명 그대로 DMG를 �
 `spctl -a -t execute`로 검사해 `accepted, source=Notarized Developer ID`가
 뜨는 것까지 확인했습니다 (2026-09-21).
 
+**수정 (2026-09-24)**: [dove-zip-flutter](https://github.com/jejezz/dove-zip-flutter)에
+적용하다가 `build-windows`의 "Package installer" 단계가 ISCC의 `You may not
+specify more than one script filename` 오류로 실패했습니다. Git Bash가
+`/DMyAppName=...` 같은 ISCC 옵션을 POSIX 경로로 보고 Windows 경로로 바꿔
+넘긴 것이 원인이라, 이 단계에 `MSYS_NO_PATHCONV=1` /
+`MSYS2_ARG_CONV_EXCL=*`를 설정해 인자를 그대로 넘기도록 고쳤습니다(Windows
+러너에서 설치 프로그램 생성 확인). 이 설정이 없던 portside 검증 당시에는
+드러나지 않았습니다 — 이 템플릿을 이미 복사해 쓰는 앱이 있다면 같은 두 줄을
+더하십시오.
+
 ## 참고: 나중에 Windows 코드 서명이 필요해지면
 
 fastlane 생태계가 Windows를 사실상 지원하지 않으므로, 코드 서명
