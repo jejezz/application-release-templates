@@ -9,7 +9,7 @@
 #   scripts/bump-version.sh 1.5.0-rc.1   1.4.2+37 -> 1.5.0-rc.1+38
 #
 # The build number always goes up by exactly one and never resets. A
-# Cargo.toml next to pubspec.yaml is bumped to the same version. Commits as
+# Cargo.toml at the repository root is bumped to the same version. Commits as
 # `chore(release): vX.Y.Z` but does NOT tag — tag the merge commit on main
 # after the PR lands (conventions/tagging.md §2).
 #
@@ -21,8 +21,18 @@ usage() { sed -n '3,9p' "$0" | sed 's/^# \{0,1\}//'; exit 1; }
 [ $# -eq 1 ] || usage
 
 cd "$(git rev-parse --show-toplevel)"
+# pubspec.yaml at the root, or one level down when the Flutter app lives in
+# a subfolder next to other code (e.g. gui/ beside a Rust crate).
 PUBSPEC=pubspec.yaml
-[ -f "$PUBSPEC" ] || { echo "no $PUBSPEC at the repository root" >&2; exit 1; }
+if [ ! -f "$PUBSPEC" ]; then
+  candidates=$(ls -1 */pubspec.yaml 2>/dev/null || true)
+  if [ "$(printf '%s' "$candidates" | grep -c .)" = "1" ]; then
+    PUBSPEC="$candidates"
+  else
+    echo "no pubspec.yaml at the repository root (or exactly one in a subfolder)" >&2
+    exit 1
+  fi
+fi
 
 if [ -n "$(git status --porcelain)" ]; then
   echo "working tree is not clean — commit or stash first" >&2

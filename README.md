@@ -12,6 +12,7 @@
 |---|---|---|
 | [`mobile/`](mobile/) | iOS, Android | Fastlane으로 TestFlight / Play 내부 테스트 트랙에 업로드 |
 | [`desktop/`](desktop/) | macOS, Windows, Linux | 태그 푸시 → GitHub Release에 빌드 산출물 직접 첨부 (macOS는 Developer ID 서명 + 공증 포함) |
+| [`skills/`](skills/) | Claude Code | 규약 적용을 단계별로 처리하는 스킬 3개(새 앱 준비, 릴리스 직전 확인, 기존 앱 정비)와 설치 방법 |
 | [`common/`](common/) | 모든 앱 | 정보 창, `app_identity.dart`, 아이콘 생성 스크립트, 버전 올림 스크립트 등 플랫폼과 무관한 공통 파일 |
 
 각 폴더의 README가 실제 적용 방법(복사할 파일, 고쳐야 할 자리, 등록할
