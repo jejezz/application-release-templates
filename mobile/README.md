@@ -14,6 +14,14 @@ macOS/Windows/Linux 데스크톱 앱은 여기가 아니라 [../desktop/](../des
 스토어 심사 없이 GitHub Release로 직접 배포하는 방식이라 구조가 완전히
 달라서 별도 템플릿으로 관리합니다.
 
+## 태그와 버전 검사
+
+두 워크플로 모두 `vX.Y.Z` 태그를 푸시하면 돕니다. 먼저 `check-version`
+잡이 태그와 `pubspec.yaml` 버전이 같은지 확인하고, 다르면 스토어에 올리지
+않고 멈춥니다 ([versioning.md](../conventions/versioning.md)). 수동
+실행(`workflow_dispatch`)은 이 검사를 건너뛰고 build number를 덮어쓸 수
+있습니다. Flutter 버전은 `env.FLUTTER_VERSION`으로 고정합니다.
+
 ## 적용 대상
 
 - **iOS** — fastlane match(인증서) + App Store Connect API Key + TestFlight 업로드

@@ -1,5 +1,9 @@
 # Application Release Templates
 
+> 버전·태그·패키징·정보 창·아이콘·라이선스 등 **모든 앱이 따라야 할 공통 규약**은
+> [`conventions/`](conventions/)에 있습니다. 새 앱은 기능 구현 전에
+> [새 앱 시작 체크리스트](conventions/README.md#새-앱-시작-체크리스트)부터 끝내십시오.
+
 여러 Flutter 앱에 그대로 옮겨 쓸 수 있게 일반화한 GitHub Actions 릴리스
 워크플로 템플릿 모음입니다. 배포 방식이 근본적으로 다른 두 그룹으로
 나뉩니다.
@@ -8,6 +12,8 @@
 |---|---|---|
 | [`mobile/`](mobile/) | iOS, Android | Fastlane으로 TestFlight / Play 내부 테스트 트랙에 업로드 |
 | [`desktop/`](desktop/) | macOS, Windows, Linux | 태그 푸시 → GitHub Release에 빌드 산출물 직접 첨부 (macOS는 Developer ID 서명 + 공증 포함) |
+| [`skills/`](skills/) | Claude Code | 규약 적용을 단계별로 처리하는 스킬 3개(새 앱 준비, 릴리스 직전 확인, 기존 앱 정비)와 설치 방법 |
+| [`common/`](common/) | 모든 앱 | 정보 창, `app_identity.dart`, 아이콘 생성 스크립트, 버전 올림 스크립트 등 플랫폼과 무관한 공통 파일 |
 
 각 폴더의 README가 실제 적용 방법(복사할 파일, 고쳐야 할 자리, 등록할
 시크릿)을 다룹니다. 두 템플릿 모두 최초 도입 시 실제 앱 저장소에서 끝까지

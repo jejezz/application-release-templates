@@ -1,12 +1,13 @@
 name: Release · Android
 
+# From jejezz/application-release-templates mobile/ @ conventions-v1.
 # Template — see this template's README (application-release-templates/mobile) for setup and the __PLACEHOLDER__
 # tokens to fill in before this is usable.
 
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
   workflow_dispatch:
     inputs:
       track:
@@ -24,8 +25,32 @@ on:
         required: false
         type: string
 
+env:
+  # Pin Flutter so re-running a tag rebuilds the same thing
+  # (conventions/workflow.md §3). Bump it in a PR.
+  FLUTTER_VERSION: "3.47.1"
+
 jobs:
+  # conventions/versioning.md: the tag must equal pubspec.yaml's version.
+  # Skipped on a manual run (no tag).
+  check-version:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag matches pubspec.yaml version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | head -1 | sed -E 's/^version:[[:space:]]*([^+[:space:]]+).*/\1/')
+          if [ "$TAG_VERSION" != "$PUBSPEC_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match pubspec.yaml version $PUBSPEC_VERSION"
+            exit 1
+          fi
+
   release:
+    needs: check-version
+    # Run on a manual dispatch too, where check-version is skipped.
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +62,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
       - name: Install Flutter dependencies
