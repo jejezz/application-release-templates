@@ -152,6 +152,13 @@ jobs:
       # (a GUID) needs to be edited by hand, see that file's comment.
       - name: Package installer
         shell: bash
+        # Git Bash would treat ISCC's /D... switches as POSIX paths and
+        # rewrite them into Windows paths, so ISCC sees extra script file
+        # names ("You may not specify more than one script filename"). Pass
+        # the arguments through unchanged.
+        env:
+          MSYS_NO_PATHCONV: "1"
+          MSYS2_ARG_CONV_EXCL: "*"
         run: |
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
