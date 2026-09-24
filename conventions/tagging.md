@@ -48,9 +48,9 @@ git push origin v1.4.2
 
 ### 4. 커밋 메시지
 
-🟡 **결정 필요** — 지금 쓰는 스타일은 세 가지입니다: 영어 명령형
-(dove, portside, MacBroom), 한국어 서술형(allwinner, saturn), Conventional
-Commits + 한국어(daylight). 아래는 제안입니다.
+지금 쓰는 스타일은 세 가지입니다: 영어 명령형(dove, portside,
+MacBroom), 한국어 서술형(allwinner, saturn), Conventional Commits +
+한국어(daylight). 이를 하나로 정합니다.
 
 - 형식은 Conventional Commits 접두어 + 한국어 본문입니다.
   `<type>: <무엇을 했는지>`

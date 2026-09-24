@@ -5,8 +5,8 @@
 - LICENSE 파일: allwinner와 saturn에는 없습니다. 나머지는 MIT이지만
   저작권자 이름이 `jyahn` / `Jong-yun Ahn` / `Jongyun Ahn`으로 다릅니다.
 - 오픈소스 라이선스 화면(`LicensePage`): 어느 앱에도 없습니다.
-- 에셋 저작자 표시: 모든 앱이 Icons8 아이콘과 SeoulNamsan 폰트를
-  쓰는데, 저작자 표시를 한 곳은 allwinner의 Icons8 한 건뿐입니다.
+- 에셋 저작자 표시: 모든 앱이 Icons8 아이콘(유료 플랜)과 SeoulNamsan
+  폰트를 쓰는데, 폰트 라이선스를 등록한 앱은 없습니다.
 - portside의 README에 libserialport(LGPL v3) 사용이 적혀 있습니다.
 
 ## 규칙
@@ -15,8 +15,8 @@
 
 | 저장소 | 라이선스 | LICENSE 파일 |
 |---|---|---|
-| 공개 저장소 (`jejezz/*` 개인 앱) | **MIT** | 필수 |
-| 비공개 / 업무 앱 (`ptype-co-kr/*`) | 비공개(Proprietary) | 필수. 한 줄이면 됩니다: `Copyright © <연도> <저작권자>. All rights reserved. 무단 복제·배포 금지.` |
+| 공개 저장소 | **MIT** | 필수 |
+| 비공개 저장소 | 비공개(Proprietary) | 필수. 한 줄이면 됩니다: `Copyright © <연도> Jongyun Ahn. All rights reserved.` |
 
 MIT LICENSE는 원문 그대로 쓰고 첫 줄만 바꿉니다.
 
@@ -58,7 +58,7 @@ void registerExtraLicenses() {
 
 | 대상 | 조건 | 해야 할 것 |
 |---|---|---|
-| **Icons8** (무료 플랜) | 저작자 표시와 링크 필수 | 정보 창에 `앱 아이콘: Icons8 (icons8.com)` 한 줄 + README 크레딧. 유료 플랜이면 표시 의무 없음 🟡 (플랜 확인 필요) |
+| **Icons8** (유료 플랜 사용 중) | 저작자 표시 의무 없음 | 정보 창에 표시하지 않습니다. README 크레딧은 선택. 구독을 해지하면 새로 받는 에셋에는 무료 플랜 조건(저작자 표시와 링크)이 적용되므로, 그때는 정보 창에 한 줄을 넣습니다 |
 | **SeoulNamsan 폰트** (서울시) | 무료 사용 가능, 폰트 파일 단독 판매 금지 | 라이선스 등록(위 2번), README 크레딧 |
 | **LGPL 라이브러리** (예: libserialport) | 사용자가 라이브러리를 교체할 수 있어야 함 → **동적 링크** 유지 | 정적 링크 금지. README와 오픈소스 라이선스 화면에 명시 |
 | **GPL** | 앱 전체에 GPL 적용 | 사용하지 않습니다 |

@@ -1,8 +1,8 @@
 # 앱 공통 규약 (Conventions)
 
 앱마다 기능은 다르지만 **버전, 태그, 릴리스 워크플로, 패키징, 정보 창,
-아이콘, 라이선스, 앱 정체성(이름·ID·저작권)** 은 모든 앱이 같은 형식을
-따라야 합니다. 이 폴더는 그 형식을 정한 문서이고, 옆의
+아이콘, 라이선스, 앱 정체성(이름·ID·저작권), UI/UX, 글꼴, 언어, 테마**는
+모든 앱이 같은 형식을 따라야 합니다. 이 폴더는 그 형식을 정한 문서이고, 옆의
 [`../desktop/`](../desktop/), [`../mobile/`](../mobile/)는 이 규약을
 구현한 복사용 템플릿입니다. 규약을 바꿀 때는 템플릿도 같은 커밋에서
 바꿉니다.
@@ -10,8 +10,9 @@
 > **상태: 초안 (2026-09-24)** — 로컬 앱 6개(allwinner-phoenix,
 > daylight-commander, dove-zip, garbage-cleaner(MacBroom), portside,
 > saturn-mobile-client)의 실제 설정을 비교해서 만들었습니다. 비교 결과는
-> [survey-2026-09.md](survey-2026-09.md)에 있습니다. `🟡 결정 필요` 표시가
-> 붙은 항목은 아직 확정되지 않은 선택입니다.
+> [survey-2026-09.md](survey-2026-09.md)에 있습니다. `🟡 TODO` 표시가
+> 붙은 항목은 규칙은 정해졌지만 아직 템플릿·공통 패키지로 옮기지 않은
+> 작업입니다.
 
 ## 문서
 
@@ -25,6 +26,10 @@
 | [about-dialog.md](about-dialog.md) | 정보 창(About)의 필수 항목, 배치, 진입 경로 |
 | [icons.md](icons.md) | 앱 아이콘 원본과 생성 파이프라인, 앱 안 UI 아이콘 테마 |
 | [licensing.md](licensing.md) | 앱 라이선스, 서드파티 고지, 폰트/아이콘 저작자 표시 |
+| [ui-ux.md](ui-ux.md) | Saturn 디자인 언어, 토큰, 밀도, 창 크기, 상태 화면, 단축키, 입력 |
+| [fonts.md](fonts.md) | SeoulNamsan, 대체 글꼴, 고정폭 글꼴, 사용자 콘텐츠 글꼴 |
+| [localization.md](localization.md) | gen-l10n, 한국어 기준 + 영어, 언어 선택 방식, 설정 저장 키, 날짜·숫자 형식 |
+| [theming.md](theming.md) | 시스템/라이트/다크, 색 토큰, 전환 UI, 창 테두리 밝기 |
 
 ## 새 앱 시작 체크리스트
 
@@ -42,18 +47,25 @@
 4. **아이콘** — 원본을 `assets/icon/`에 두고 생성 스크립트로 모든
    플랫폼 아이콘을 만듭니다 ([icons.md](icons.md)).
 5. **버전 `0.1.0+1`** 로 시작 ([versioning.md](versioning.md)).
-6. **정보 창** — [about-dialog.md](about-dialog.md) 형식대로. 버전은
+6. **앱 골격** — 첫 화면을 만들기 전에 아래를 먼저 깝니다.
+   - Saturn 테마 토큰과 공통 위젯 ([ui-ux.md](ui-ux.md))
+   - SeoulNamsan과 대체 글꼴 ([fonts.md](fonts.md))
+   - gen-l10n ko/en과 언어 전환 ([localization.md](localization.md))
+   - 시스템/라이트/다크 전환 ([theming.md](theming.md))
+   - `window_manager` 창 크기
+   - 앱 바 오른쪽 `테마 | 언어 | 정보` 버튼
+7. **정보 창** — [about-dialog.md](about-dialog.md) 형식대로. 버전은
    `package_info_plus`로 읽고 코드에 하드코딩하지 않습니다.
-7. **릴리스 워크플로 복사** — 데스크톱은 [`../desktop/`](../desktop/),
+8. **릴리스 워크플로 복사** — 데스크톱은 [`../desktop/`](../desktop/),
    모바일은 [`../mobile/`](../mobile/). 시크릿 등록.
-8. **README / CLAUDE.md** — 앱 저장소 루트의 `CLAUDE.md`에 아래 한 줄을
+9. **README / CLAUDE.md** — 앱 저장소 루트의 `CLAUDE.md`에 아래 한 줄을
    넣어 Claude가 항상 이 규약을 먼저 읽게 합니다.
    ```markdown
-   릴리스·버전·패키징·정보 창·아이콘·라이선스는
+   릴리스·버전·패키징·정보 창·아이콘·라이선스·UI/UX·글꼴·언어·테마는
    https://github.com/jejezz/application-release-templates/tree/main/conventions
    규약을 따른다. 이 앱에 적용된 규약 버전: conventions-v1
    ```
-9. **첫 릴리스 `v0.1.0`** 을 태그해서 파이프라인 전체가 한 번 끝까지
+10. **첫 릴리스 `v0.1.0`** 을 태그해서 파이프라인 전체가 한 번 끝까지
    도는 것을 확인한 뒤 기능 개발을 시작합니다.
 
 ## 규약 버전

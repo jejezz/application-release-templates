@@ -38,7 +38,6 @@ daylight와 dove-zip 형식이 가장 완성도가 높으므로 이를 기준으
 │ ─────────────────────────────────────────  │
 │ Copyright © 2026 Jongyun Ahn              │  ← identity.md 저작권 문자열
 │ MIT License                                │
-│ 앱 아이콘: Icons8 (icons8.com)             │  ← 외부 에셋을 쓴 경우만 (licensing.md)
 │                                           │
 │ [오픈소스 라이선스]  [GitHub]      [닫기]   │
 └───────────────────────────────────────────┘
@@ -53,7 +52,7 @@ daylight와 dove-zip 형식이 가장 완성도가 높으므로 이를 기준으
 | 기능 목록 | 선택 | 넣는다면 6개 이하. 스크롤이 생기면 뺍니다 |
 | 저작권 | ✓ | [identity.md](identity.md)의 문자열 그대로 |
 | 라이선스 이름 | ✓ | 예: `MIT License` |
-| 에셋 저작자 표시 | 조건부 | Icons8 등 저작자 표시 조건이 있는 에셋을 쓴 경우 |
+| 에셋 저작자 표시 | 조건부 | 저작자 표시 조건이 있는 에셋을 쓴 경우만. Icons8은 유료 플랜이라 넣지 않습니다 |
 | 오픈소스 라이선스 버튼 | ✓ | `showLicensePage(applicationName:, applicationVersion:, applicationIcon:, applicationLegalese:)` |
 | GitHub / 웹사이트 버튼 | 공개 저장소면 ✓ | `url_launcher` |
 | 닫기 | ✓ | FilledButton, 오른쪽 끝 |
@@ -76,7 +75,6 @@ showAppAboutDialog(
   tagline: l10n.aboutTagline,
   description: l10n.aboutDescription,
   repositoryUrl: 'https://github.com/jejezz/dove-zip-flutter',
-  assetCredits: const ['앱 아이콘: Icons8 (icons8.com)'],
 );
 ```
 
