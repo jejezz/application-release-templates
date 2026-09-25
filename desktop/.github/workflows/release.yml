@@ -9,6 +9,24 @@ name: Release
 # exist yet, run `flutter create --platforms=macos,windows,linux .` in the
 # project root first.
 #
+# Flutter app in a subfolder (e.g. gui/ beside a Rust crate at the repository
+# root; .github/, installer/, tool/readme/, README*, LICENSE stay at the root).
+# allwinner-phoenix's release.yml is a working example. Changes:
+#   - uncomment `defaults: run: working-directory:` below, so every `run:`
+#     step (pub get, gen-l10n, flutter build, signing, packaging) runs in the
+#     app folder;
+#   - give the steps that use repository-root files `working-directory: .`:
+#     "README follows conventions", "Package installer" (installer/windows/
+#     app.iss — pass the app's build output as gui/build/…), and the release
+#     job (`defaults: run: working-directory: .`; "Checksums" keeps dist);
+#   - `uses:` steps ignore run defaults, so paths they see need the prefix:
+#     write DMG_PATH=gui/$DMG_PATH to GITHUB_ENV (then "Notarize DMG" runs
+#     in `.`), and upload path: "gui/*-linux-x64.tar.gz";
+#   - read Cargo.toml as ../Cargo.toml in the check job (scripts/bump-version.sh
+#     already bumps a root Cargo.toml together with gui/pubspec.yaml);
+#   - `hashFiles('l10n.yaml')` is relative to the repository root: write
+#     hashFiles('gui/l10n.yaml').
+#
 # Push a `vX.Y.Z` (or `vX.Y.Z-rc.N`) tag to:
 #   1. check  — the tag must equal pubspec.yaml's version, and every
 #               translation must be present (conventions/versioning.md,
@@ -30,6 +48,11 @@ env:
   # Pin Flutter so re-running a tag rebuilds the same thing
   # (conventions/workflow.md §3). Bump it in a PR.
   FLUTTER_VERSION: "3.47.1"
+
+# Flutter app in a subfolder (see the header):
+# defaults:
+#   run:
+#     working-directory: gui
 
 jobs:
   check:

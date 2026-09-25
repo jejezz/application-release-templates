@@ -40,6 +40,11 @@ python3 "$T/tools/audit_app.py" <app> --stage maintain
 `maintain` lists every gap (the full debt list) without release readiness —
 that's the release-check skill's job.
 
+`<app>` is the folder with `pubspec.yaml` — a subfolder such as `gui/` when the
+Flutter app sits beside other code (a Rust crate). Repository-level files
+(`.github/`, `LICENSE`, `CLAUDE.md`, `README*.md`, `scripts/`, `installer/`,
+`tool/readme/`) are then checked at the git root.
+
 Then read the app's row in `$T/conventions/survey-2026-09.md` ("규약 적용 시
 앱별 할 일") for things the script can't see — but it's a snapshot from
 2026-09-24: confirm each item in the code before planning it; drop the ones

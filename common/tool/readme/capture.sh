@@ -25,12 +25,21 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 here="$root/tool/readme"
 raw="$root/docs/screenshots/raw"
 out="$root/docs/screenshots"
+# The Flutter app: the repository root, or its one */pubspec.yaml subfolder
+# (e.g. gui/ beside a Rust crate) — same rule as scripts/bump-version.sh.
+app="$root"
+if [ ! -f "$root/pubspec.yaml" ]; then
+  candidates=$(cd "$root" && ls -1 */pubspec.yaml 2>/dev/null || true)
+  if [ "$(printf '%s' "$candidates" | grep -c .)" = "1" ]; then
+    app="$root/$(dirname "$candidates")"
+  fi
+fi
 
 GIF_WIDTH="${GIF_WIDTH:-760}"   # MacBroom's demo.gif: 760px, 15 fps
 GIF_FPS="${GIF_FPS:-15}"
 
 app_name() {
-  grep '^PRODUCT_NAME' "$root/macos/Runner/Configs/AppInfo.xcconfig" | head -1 \
+  grep '^PRODUCT_NAME' "$app/macos/Runner/Configs/AppInfo.xcconfig" | head -1 \
     | sed -E 's/^PRODUCT_NAME[[:space:]]*=[[:space:]]*//'
 }
 

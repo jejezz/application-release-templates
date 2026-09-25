@@ -3,7 +3,7 @@
      {{TODO: …}}를 모두 채우십시오. 하나라도 남아 있으면 tool/readme/check_readme.py가 실패합니다. -->
 
 <p align="center">
-  <img src="assets/icon/app_icon.png" width="128" alt="{{DISPLAY_NAME}} 아이콘">
+  <img src="{{APP_DIR}}assets/icon/app_icon.png" width="128" alt="{{DISPLAY_NAME}} 아이콘">
 </p>
 
 <h1 align="center">{{DISPLAY_NAME}}</h1>
@@ -73,6 +73,9 @@
 ## 개발
 
 ```bash
+<!-- if:subfolder -->
+cd {{APP_DIR}}
+<!-- endif:subfolder -->
 flutter pub get
 flutter run -d {{RUN_DEVICE}}
 ```

@@ -7,6 +7,10 @@
 
 flutter create's own README.md is replaced without --force.
 
+The README goes to the repository root; app files are read from the root,
+or from its one */pubspec.yaml subfolder when the Flutter app lives next to
+other code (e.g. gui/ beside a Rust crate).
+
 Fills in everything the repository already knows:
 
   {{DISPLAY_NAME}}    lib/app_identity.dart displayName, else AppInfo.xcconfig PRODUCT_NAME
@@ -16,8 +20,10 @@ Fills in everything the repository already knows:
   {{MIN_MACOS}}       macos/Podfile `platform :osx`, else the Xcode project's MACOSX_DEPLOYMENT_TARGET
   {{RUN_DEVICE}}      macos / windows / linux / a phone
   {{YEAR}}            AppIdentity.firstReleaseYear, else this year
+  {{APP_DIR}}         '' — or 'gui/' when the Flutter app lives in a subfolder
 
-and keeps only the <!-- if:… --> blocks for those platforms. What only you
+and keeps only the <!-- if:… --> blocks for those platforms (and
+<!-- if:subfolder --> for an app in a subfolder). What only you
 know is left as {{TODO: …}} — tool/readme/check_readme.py fails until each
 is filled in.
 
@@ -32,12 +38,26 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def app_dir(root: Path) -> Path:
+    """The Flutter app: the repository root, or its one */pubspec.yaml
+    subfolder when the app lives next to other code (allwinner-phoenix: gui/
+    beside a Rust crate) — the same rule as scripts/bump-version.sh. The
+    README stays at the repository root."""
+    if (root / 'pubspec.yaml').exists():
+        return root
+    found = sorted(root.glob('*/pubspec.yaml'))
+    return found[0].parent if len(found) == 1 else root
+
+
+APP = app_dir(ROOT)
 HERE = Path(__file__).resolve().parent
 TARGETS = {'README.template.md': 'README.md', 'README.ko.template.md': 'README.ko.md'}
 
 
 def read(path: str) -> str:
-    p = ROOT / path
+    p = APP / path
     return p.read_text(encoding='utf-8') if p.exists() else ''
 
 
@@ -65,7 +85,7 @@ def repo_slug() -> str:
 
 
 def platforms() -> list[str]:
-    return [p for p in ('macos', 'windows', 'linux', 'ios', 'android') if (ROOT / p).is_dir()]
+    return [p for p in ('macos', 'windows', 'linux', 'ios', 'android') if (APP / p).is_dir()]
 
 
 def min_macos() -> str:
@@ -109,7 +129,7 @@ def placeholder_media(name: str) -> None:
     except ImportError:
         print('note     Pillow missing — no placeholder images (pip3 install pillow)')
         return
-    icon_path = ROOT / 'assets/icon/app_icon.png'
+    icon_path = APP / 'assets/icon/app_icon.png'
     for readme in TARGETS.values():
         text = (ROOT / readme).read_text(encoding='utf-8') if (ROOT / readme).exists() else ''
         for rel in sorted(set(re.findall(r'src="(docs/screenshots/[^"{}]+)"', text))):
@@ -157,6 +177,8 @@ def main() -> None:
     desktop = [p for p in plats if p in ('macos', 'windows', 'linux')]
     mobile = [p for p in plats if p in ('ios', 'android')]
     enabled = set(plats) | ({'desktop'} if desktop else set()) | ({'mobile'} if mobile else set())
+    if APP != ROOT:
+        enabled.add('subfolder')  # `cd gui/` before the flutter commands
 
     names = {'macos': 'macOS', 'windows': 'Windows', 'linux': 'Linux', 'ios': 'iOS', 'android': 'Android'}
     name = display_name()
@@ -171,6 +193,8 @@ def main() -> None:
         'MIN_MACOS': min_macos() if 'macos' in plats else '',
         'RUN_DEVICE': desktop[0] if desktop else '<device-id>',
         'YEAR': first_year(),
+        # README paths are relative to the repository root: gui/ in a subfolder app.
+        'APP_DIR': '' if APP == ROOT else APP.relative_to(ROOT).as_posix() + '/',
     }
 
     for template, target in TARGETS.items():
