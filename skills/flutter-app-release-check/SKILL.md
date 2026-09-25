@@ -21,7 +21,9 @@ git -C "$T" pull --ff-only --quiet || echo "could not update $T — using the ch
 
 The app is the current working directory unless the user named another. If
 `pubspec.yaml` is in a subfolder (e.g. `gui/` beside a Rust crate), use that
-folder as `<app>`; git commands still run at the repository root.
+folder as `<app>`; git commands still run at the repository root, and the
+audit reads repository-level files (`.github/`, `LICENSE`, `CLAUDE.md`,
+`README*.md`, `scripts/`, `installer/`, `tool/readme/`) from there.
 
 ## 1. Run the checks
 

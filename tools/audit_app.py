@@ -31,6 +31,11 @@ blocks_release / 🛑. One that only matters once the app adopts the
 conventions-v1 workflow is needed_for_upgrade / ⤴. With --release, a
 verdict is added: go · bump (only the version bump is missing) · hold.
 
+Pass the Flutter app directory. When it is a subfolder of the repository
+(allwinner-phoenix: gui/ beside a Rust crate), repository-level files —
+.github/, LICENSE, CLAUDE.md, README*.md, scripts/, installer/, tool/readme/ —
+are read from the git root; app files from the app directory.
+
 Exit status: 1 if any check fails, else 0. The script never modifies the app.
 Used by the flutter-app-bootstrap / flutter-app-release-check /
 flutter-app-convention-audit skills in skills/.
@@ -39,6 +44,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 from dataclasses import asdict, dataclass
@@ -85,24 +91,31 @@ class Audit:
         self.release = stage == 'release'
         self.bootstrap = stage == 'bootstrap'
         self.checks: list[Check] = []
+        # Repository-level files (.github/, LICENSE, CLAUDE.md, README*, scripts/,
+        # installer/, tool/readme/) live at the git root, which is not the app
+        # dir when the Flutter app sits in a subfolder (allwinner-phoenix: gui/
+        # beside a Rust crate). App files (lib/, macos/, pubspec.yaml, l10n.yaml,
+        # assets/, tool/icon/) stay relative to the app dir.
+        top = self.git('rev-parse', '--show-toplevel')
+        self.repo = Path(top).resolve() if top else root
         self.platforms = [p for p in ('macos', 'windows', 'linux', 'ios', 'android') if (root / p).is_dir()]
         self.desktop = [p for p in self.platforms if p in ('macos', 'windows', 'linux')]
         self.mobile = [p for p in self.platforms if p in ('ios', 'android')]
-        rel = self.read('.github/workflows/release.yml')
+        rel = self.read('.github/workflows/release.yml', repo=True)
         # Does the app already run the conventions-v1 desktop workflow? Several
         # checks only break a release under it.
         self.modern = bool(re.search(r'^\s{2}check:\s*$', rel, re.M)) and 'macos-universal.dmg' in rel
 
     # -- helpers -----------------------------------------------------------
-    def read(self, rel: str) -> str:
-        p = self.root / rel
+    def read(self, rel: str, repo: bool = False) -> str:
+        p = (self.repo if repo else self.root) / rel
         try:
             return p.read_text(encoding='utf-8', errors='replace') if p.is_file() else ''
         except OSError:
             return ''
 
-    def exists(self, rel: str) -> bool:
-        return (self.root / rel).exists()
+    def exists(self, rel: str, repo: bool = False) -> bool:
+        return ((self.repo if repo else self.root) / rel).exists()
 
     def lib_dart(self) -> str:
         if not hasattr(self, '_lib'):
@@ -119,11 +132,15 @@ class Audit:
             self._lib = '\n'.join(parts)
         return self._lib
 
-    def _own(self, p: Path) -> bool:
-        """A file of the app itself — not build output, tool caches, or another
-        checkout nested inside (e.g. .claude/worktrees/*)."""
-        parts = p.relative_to(self.root).parts
-        return not any(part.startswith('.') or part == 'build' for part in parts)
+    def repo_files(self, suffix: str) -> list[Path]:
+        """Files of the repository itself with this suffix — not build output
+        (build/, Rust target/), tool caches, or another checkout nested inside
+        (e.g. .claude/worktrees/*)."""
+        found = []
+        for dirpath, dirs, files in os.walk(self.repo):
+            dirs[:] = sorted(d for d in dirs if not d.startswith('.') and d not in ('build', 'target', 'node_modules'))
+            found += [Path(dirpath) / f for f in sorted(files) if f.endswith(suffix)]
+        return found
 
     def git(self, *args: str) -> str:
         try:
@@ -254,7 +271,8 @@ class Audit:
         tag = self.latest_tag()
         if tag:
             tag_ver = tag[1:]
-            tag_pubspec = self.git('show', f'{tag}:pubspec.yaml')
+            # ./ = relative to the app dir, so gui/pubspec.yaml in a subfolder app.
+            tag_pubspec = self.git('show', f'{tag}:./pubspec.yaml')
             tm = re.search(r'^version:\s*\S+\+(\d+)', tag_pubspec, re.M)
             if self._semver(name) < self._semver(tag_ver):
                 self.add('version.not-behind-tag', a, 'fail', f'pubspec {name} is behind latest tag {tag}',
@@ -276,17 +294,13 @@ class Audit:
             self.add('version.not-hardcoded', a, 'pass', 'no hardcoded version in lib/')
         # Cargo.toml next to pubspec.yaml, or at the repository root when the
         # Flutter app lives in a subfolder (allwinner-phoenix: gui/).
-        cargo = self.read('Cargo.toml')
-        top = self.git('rev-parse', '--show-toplevel')
-        if not cargo and top and Path(top).resolve() != self.root:
-            p = Path(top) / 'Cargo.toml'
-            cargo = p.read_text(encoding='utf-8') if p.exists() else ''
+        cargo = self.read('Cargo.toml') or self.read('Cargo.toml', repo=True)
         if cargo:
             cm = re.search(r'^version\s*=\s*"([^"]+)"', cargo, re.M)
             ok = cm and cm.group(1) == name
             self.add('version.cargo', a, 'pass' if ok else 'fail',
                      f'Cargo.toml {cm.group(1) if cm else "?"} vs pubspec {name}', '' if ok else 'bump together', doc, blocks=True)
-        if not self.exists('scripts/bump-version.sh'):
+        if not self.exists('scripts/bump-version.sh', repo=True):
             self.add('version.bump-script', a, 'warn', 'scripts/bump-version.sh missing',
                      'copy common/scripts/bump-version.sh', doc)
         else:
@@ -300,7 +314,7 @@ class Audit:
 
     def workflow(self) -> None:
         a, doc = 'workflow', 'workflow.md'
-        wf = self.root / '.github/workflows'
+        wf = self.repo / '.github/workflows'
         files = {p.name: p.read_text(encoding='utf-8', errors='replace') for p in wf.glob('*.y*ml')} if wf.is_dir() else {}
         if self.desktop:
             rel = files.get('release.yml', '')
@@ -328,7 +342,7 @@ class Audit:
                 if pin and pin.group(1) != FLUTTER_VERSION:
                     self.add('workflow.flutter-version', a, 'warn',
                              f'FLUTTER_VERSION {pin.group(1)} (template: {FLUTTER_VERSION})', 'bump in a PR if intended', doc)
-            header = self.read('.github/release-notes-header.md')
+            header = self.read('.github/release-notes-header.md', repo=True)
             if '__MIN_MACOS__' in header:
                 self.add('workflow.notes-header', a, 'fail', 'release-notes-header.md still has __MIN_MACOS__',
                          'set it to MACOSX_DEPLOYMENT_TARGET from macos/Runner.xcodeproj/project.pbxproj', doc,
@@ -354,10 +368,10 @@ class Audit:
     def packaging(self) -> None:
         a, doc = 'packaging', 'packaging.md'
         if 'windows' in self.platforms:
-            iss_files = [p for p in self.root.rglob('*.iss') if self._own(p)]
+            iss_files = self.repo_files('.iss')
             iss = iss_files[0].read_text(encoding='utf-8', errors='replace') if iss_files else ''
-            if iss_files and iss_files[0].relative_to(self.root).as_posix() != 'installer/windows/app.iss':
-                self.add('packaging.iss-path', a, 'warn', f'installer at {iss_files[0].relative_to(self.root)}',
+            if iss_files and iss_files[0].relative_to(self.repo).as_posix() != 'installer/windows/app.iss':
+                self.add('packaging.iss-path', a, 'warn', f'installer at {iss_files[0].relative_to(self.repo)}',
                          'move to installer/windows/app.iss (the release workflow expects it there)', doc)
             if not iss:
                 self.add('packaging.iss', a, 'fail', 'no Inno Setup script', 'copy desktop/installer/windows/app.iss', doc,
@@ -378,14 +392,14 @@ class Audit:
                          'installer: ' + ('; '.join(problems) if problems else 'matches the template'),
                          'update from desktop/installer/windows/app.iss — keep the existing AppId GUID' if problems else '', doc,
                          blocks=self.modern and 'windows-x64-setup' not in iss, upgrade=True)
-            if any(self._own(p) for p in self.root.rglob('*.wxs')):
+            if self.repo_files('.wxs'):
                 self.add('packaging.no-wix', a, 'warn', 'WiX .wxs file present', 'Inno Setup only — delete the .wxs', doc)
         if 'linux' in self.platforms:
             ok = self.exists('linux/install.sh')
             self.add('packaging.linux-install', a, 'pass' if ok else 'fail',
                      'linux/install.sh ' + ('present' if ok else 'missing'), '' if ok else 'copy desktop/linux/install.sh', doc,
                      blocks=self.modern, upgrade=True)
-        if self.exists('scripts/release.sh'):
+        if self.exists('scripts/release.sh', repo=True):
             self.add('packaging.no-local-release', a, 'warn', 'scripts/release.sh (local release script)',
                      'release through CI; keep local scripts as dev builds only', doc)
 
@@ -441,7 +455,7 @@ class Audit:
 
     def licensing(self) -> None:
         a, doc = 'licensing', 'licensing.md'
-        lic = self.read('LICENSE')
+        lic = self.read('LICENSE', repo=True)
         if not lic:
             self.add('license.file', a, 'fail', 'LICENSE missing', 'MIT (public) or proprietary one-liner (private)', doc)
         elif 'MIT License' in lic and HOLDER not in lic:
@@ -552,14 +566,15 @@ class Audit:
 
     def readme(self) -> None:
         a, doc = 'readme', 'readme-guide.md'
-        if not self.exists('README.md'):
+        # README and tool/readme/ sit at the repository root (the GitHub page).
+        if not self.exists('README.md', repo=True):
             self.add('readme.exists', a, 'fail', 'README.md missing', 'python3 tool/readme/init_readme.py', doc)
             return
-        checker = self.root / 'tool/readme/check_readme.py'
+        checker = self.repo / 'tool/readme/check_readme.py'
         if checker.exists():
             # Before features exist only the structure is checked (--stage bootstrap).
             args = ['python3', str(checker)] + (['--stage', 'bootstrap'] if self.bootstrap else [])
-            r = subprocess.run(args, cwd=self.root, capture_output=True, text=True)
+            r = subprocess.run(args, cwd=self.repo, capture_output=True, text=True)
             errors = [l for l in r.stdout.splitlines() if l.startswith('error')]
             warns = [l for l in r.stdout.splitlines() if l.startswith('warning')]
             # The release workflow runs the checker whenever it exists.
@@ -568,18 +583,19 @@ class Audit:
                                            if r.returncode == 0 else f'{len(errors)} errors: ' + errors[0][9:90]),
                      '' if r.returncode == 0 else 'python3 tool/readme/check_readme.py', doc, blocks=True)
         else:
-            head = self.read('README.md')[:1500]
+            head = self.read('README.md', repo=True)[:1500]
             has_head = '<img' in head and 'shields.io' in head
             self.add('readme.check', a, 'fail', 'README not on the template' + ('' if has_head else ' (no icon/badges/demo header)'),
                      'copy common/tool/readme/, init_readme.py, move dev notes under ## Development', doc)
-        if not self.exists('README.ko.md'):
-            self.add('readme.korean', a, 'warn' if self.exists('README.en.md') else 'fail',
-                     'README.ko.md missing' + (' (has README.en.md — flip: README.md en, README.ko.md ko)' if self.exists('README.en.md') else ''),
+        if not self.exists('README.ko.md', repo=True):
+            en = self.exists('README.en.md', repo=True)
+            self.add('readme.korean', a, 'warn' if en else 'fail',
+                     'README.ko.md missing' + (' (has README.en.md — flip: README.md en, README.ko.md ko)' if en else ''),
                      'README.md English + README.ko.md Korean', doc)
 
     def meta(self) -> None:
         a = 'meta'
-        claude = self.read('CLAUDE.md')
+        claude = self.read('CLAUDE.md', repo=True)
         m = re.search(r'conventions-v(\d+)', claude)
         if m:
             self.add('meta.claude-md', a, 'pass', f'CLAUDE.md records conventions-v{m.group(1)}')
@@ -623,7 +639,7 @@ class Audit:
 
     def secrets(self) -> None:
         a = 'release'
-        wf = self.root / '.github/workflows'
+        wf = self.repo / '.github/workflows'
         used = set()
         for p in wf.glob('*.y*ml') if wf.is_dir() else []:
             used |= set(re.findall(r'secrets\.([A-Z0-9_]+)', p.read_text(encoding='utf-8', errors='replace')))
@@ -664,14 +680,14 @@ class Audit:
 ICON = {'pass': '✅', 'warn': '⚠️', 'fail': '❌', 'skip': '➖'}
 
 
-def markdown(root: Path, checks: list[Check], platforms: list[str], verdict: str | None = None,
+def markdown(name: str, checks: list[Check], platforms: list[str], verdict: str | None = None,
              stage: str = 'maintain') -> str:
     counts = {s: sum(c.status == s for c in checks) for s in ICON}
     blocking = [c for c in checks if c.blocks_release]
     upgrade = [c for c in checks if c.needed_for_upgrade]
     # 🛑 / ⤴ only mean something once an app releases; at bootstrap the goal is 0 ❌.
     detail = '' if stage == 'bootstrap' else f' (🛑 {len(blocking)} block a release, ⤴ {len(upgrade)} needed for the v1 workflow)'
-    lines = [f'# Conventions audit: {root.name} — stage: {stage}', '',
+    lines = [f'# Conventions audit: {name} — stage: {stage}', '',
              f'Platforms: {", ".join(platforms) or "none"} · '
              f'❌ {counts["fail"]}{detail} · ⚠️ {counts["warn"]} · ✅ {counts["pass"]}', '']
     if verdict:
@@ -704,11 +720,14 @@ def main() -> None:
     audit = Audit(root, stage)
     checks = audit.run()
     if args.json:
-        print(json.dumps({'app': str(root), 'stage': stage, 'platforms': audit.platforms, 'modern_workflow': audit.modern,
+        print(json.dumps({'app': str(root), 'repo': str(audit.repo), 'stage': stage, 'platforms': audit.platforms, 'modern_workflow': audit.modern,
                           'verdict': audit.verdict() if audit.release else None,
                           'checks': [asdict(c) for c in checks]}, ensure_ascii=False, indent=1))
     else:
-        print(markdown(root, checks, audit.platforms, audit.verdict() if audit.release else None, stage))
+        name = root.name
+        if audit.repo != root and root.is_relative_to(audit.repo):
+            name = f'{audit.repo.name}/{root.relative_to(audit.repo).as_posix()}'  # allwinner-phoenix/gui
+        print(markdown(name, checks, audit.platforms, audit.verdict() if audit.release else None, stage))
     raise SystemExit(1 if any(c.status == 'fail' for c in checks) else 0)
 
 

@@ -36,6 +36,20 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
+
+def app_dir(root: Path) -> Path:
+    """The Flutter app: the repository root, or its one */pubspec.yaml
+    subfolder when the app lives next to other code (allwinner-phoenix: gui/
+    beside a Rust crate) — the same rule as scripts/bump-version.sh. The
+    README stays at the repository root."""
+    if (root / 'pubspec.yaml').exists():
+        return root
+    found = sorted(root.glob('*/pubspec.yaml'))
+    return found[0].parent if len(found) == 1 else root
+
+
+APP = app_dir(ROOT)
+
 REQUIRED = {
     'README.md': ['Features', 'Install', 'Development', 'License'],
     'README.ko.md': ['기능', '설치', '개발', '라이선스'],
@@ -60,7 +74,7 @@ def is_placeholder(path: Path) -> bool:
 def display_name() -> str | None:
     for path, pattern in (('lib/app_identity.dart', r"displayName\s*=\s*'([^']+)'"),
                           ('macos/Runner/Configs/AppInfo.xcconfig', r'^PRODUCT_NAME\s*=\s*(.+)$')):
-        p = ROOT / path
+        p = APP / path
         if p.exists():
             m = re.search(pattern, p.read_text(encoding='utf-8'), re.M)
             if m:

@@ -3,7 +3,7 @@
      Fill every {{TODO: …}}; tool/readme/check_readme.py fails while any is left. -->
 
 <p align="center">
-  <img src="assets/icon/app_icon.png" width="128" alt="{{DISPLAY_NAME}} icon">
+  <img src="{{APP_DIR}}assets/icon/app_icon.png" width="128" alt="{{DISPLAY_NAME}} icon">
 </p>
 
 <h1 align="center">{{DISPLAY_NAME}}</h1>
@@ -73,6 +73,9 @@ Download from [**Releases**](https://github.com/{{REPO_SLUG}}/releases/latest):
 ## Development
 
 ```bash
+<!-- if:subfolder -->
+cd {{APP_DIR}}
+<!-- endif:subfolder -->
 flutter pub get
 flutter run -d {{RUN_DEVICE}}
 ```
