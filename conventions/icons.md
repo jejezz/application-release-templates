@@ -56,10 +56,25 @@ python3 tool/icon/generate_icons.py   # source_glyph.svg → .png → 모든 플
 | 플랫폼 | 산출물 | 형태 |
 |---|---|---|
 | macOS | `macos/Runner/Assets.xcassets/AppIcon.appiconset/` 16~1024 | 1024 캔버스 안 824px 둥근 사각형 판(반경 185, Apple 그리드)과 아래 그림자. 글리프는 440px(판의 약 53%) — 스티커 테두리 둘레에 그라데이션이 보여야 합니다 |
-| Windows | `windows/runner/resources/app_icon.ico` (256/128/64/48/32/16) | 캔버스를 꽉 채운 판(모서리 12%) 위에 글리프가 캔버스의 80%. 작업 표시줄에서 macOS 비율의 글리프는 너무 작아 보이기 때문입니다 |
-| Linux | `linux/runner/resources/app_icon.png` 512px. 릴리스 tarball에 이 파일이 들어갑니다 | Windows와 동일 |
+| Windows | `windows/runner/resources/app_icon.ico` (256/128/64/48/40/32/24/20/16) | **판 없이 글리프만**(투명 배경, 캔버스의 96%). 크기마다 따로 그리고 48px 이하는 가볍게 선명화합니다 — 아래 "Windows 예외" 참고 |
+| Linux | `linux/runner/resources/app_icon.png` 512px. 릴리스 tarball에 이 파일이 들어갑니다 | 캔버스를 꽉 채운 판(모서리 12%) 위에 글리프가 캔버스의 80% |
 | iOS | `ios/Runner/Assets.xcassets/AppIcon.appiconset/` | 꽉 찬 사각형 판. **알파 채널 제거** (App Store 거부 방지) |
 | Android | 레거시 mipmap + adaptive (`mipmap-anydpi-v26`) | 전경 = 글리프(안전 영역 66% 안), 배경 = 판 그라데이션 이미지 |
+
+#### Windows 예외: 판 없이 글리프만
+
+작업 표시줄과 탐색기 목록에는 작은 아이콘이 나란히 놓입니다. 모든 앱이 같은
+보라 판을 쓰면 16~32px에서는 판 색이 같아 글리프로만 구분해야 하는데, 연한
+글리프의 가는 윤곽선이 판 위에서 대비가 약해 알아보기 어렵습니다. macOS Dock은
+아이콘이 크고 크기도 조절할 수 있어 문제가 되지 않습니다. 그래서 Windows `.ico`만
+판을 빼고 글리프의 스티커 실루엣을 그대로 씁니다(이 판 규칙의 유일한 예외).
+
+- 1024px 원본 하나를 줄이면 윤곽선이 뭉개집니다. 16~256px을 크기마다 따로
+  그립니다.
+- Windows는 125~150% 배율에서 20/24/40px을 요청합니다. 없으면 이웃 크기를
+  늘리거나 줄여 흐려지므로 같이 넣습니다.
+- 어두운 작업 표시줄에서는 흰 스티커 테두리가 윤곽 역할을 합니다. 밝은
+  테마에서는 어두운 윤곽선에 기댑니다.
 
 ### 3. 판 색상
 
