@@ -108,6 +108,10 @@
 - 릴리스에 `SHA256SUMS.txt` 가 없거나 파일 이름이 [packaging.md](../conventions/packaging.md) §1 을 따르지 않으면 서버가 자동 설치를 막고 "릴리스 페이지에서 받기" 로 안내합니다.
 - **macOS 샌드박스:** 규약 앱은 `com.apple.security.app-sandbox = false` 입니다 (portside · dove-zip). `flutter create` 의 기본(샌드박스 켜짐, 네트워크 권한 없음)을 그대로 쓰면 업데이트 확인이 연결되지 않습니다 — 샌드박스를 켠 채로 둔다면 `com.apple.security.network.client` 가 필요하고, DMG 열기(`open`)는 따로 확인해야 합니다.
 - 종료는 정식 종료(`exitApplication(cancelable)`)라 앱의 `didRequestAppExit` 를 거칩니다 — 종료 직전에 할 정리(로그 flush · 저장)는 거기에 둡니다. 다르게 하려면 `UpdateService.create()` 대신 직접 만들어 `quitApp` 을 넘깁니다.
+- **프리릴리스 버전 함정 (첫 태그 `v0.1.0-rc.1`):** macOS 는 Info.plist 에 숫자만 허용해서 `0.1.0-rc.1+1` 이 `0.1.0.1` 로 들어가고, `PackageInfo.version` 도 그 값이라 `AppUpdater` 가 `ArgumentError: currentVersion: not a version` 을 던진다. `main()` 이 `UpdateService.create()` 를 `runApp` 앞에서 기다리면 **앱이 시작하지 못해 창이 검게 남는다.** 템플릿은 두 겹으로 막는다:
+  - `create()` 는 **절대 던지지 않는다** — 버전을 읽을 수 없으면 null(업데이트 확인 끔). 그래서 `main.dart` 에 try/catch 를 따로 둘 필요가 없다.
+  - 정확한 버전은 릴리스 워크플로가 태그에서 `--dart-define=APP_VERSION=<버전>` 으로 넣는다 (`desktop/.github/workflows/release.yml`). 없으면 `x.y.z.n` 을 `x.y.z-rc.n` 으로 본다 (규약의 프리릴리스는 rc 뿐). 로컬 `flutter run` 은 define 없이도 이 대체 규칙으로 돈다.
+  - 이미 쓰는 앱은 `lib/update/update_service.dart` 와 `release.yml` 의 `flutter build … --dart-define=APP_VERSION=${{ env.VERSION }}` 를 새 템플릿대로 맞춘다. `updater/` 는 바뀌지 않았으므로 `updater-v0.1.0` 태그는 그대로다.
 - 시작 시 확인은 첫 화면이 뜬 뒤 5초 뒤에 하고, 실패하면 아무것도 띄우지 않습니다. 수동 "업데이트 확인" 은 항상 결과를 알려 줍니다.
 
 ## 검증
