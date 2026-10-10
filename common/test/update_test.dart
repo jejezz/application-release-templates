@@ -13,6 +13,7 @@ import 'package:<package>/about/about_dialog.dart';
 import 'package:<package>/app_identity.dart';
 import 'package:<package>/l10n/app_localizations.dart';
 import 'package:<package>/update/update_dialogs.dart';
+import 'package:<package>/update/update_scope.dart';
 import 'package:<package>/update/update_service.dart';
 
 UpdateInfo _info({String notes = 'Fixed things.'}) => UpdateInfo(
@@ -360,6 +361,46 @@ void main() {
       await tester.pumpWidget(about(onCheck: () => pressed++));
       await tester.tap(find.text('업데이트 확인'));
       expect(pressed, 1);
+    });
+  });
+
+  group('UpdateScope', () {
+    Widget host(UpdateService? service) => UpdateScope(
+          service: service,
+          child: MaterialApp(
+            locale: const Locale('ko'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () => showAppAboutDialog(context, tagline: 't', description: 'd'),
+                  child: const Text('open about'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+    testWidgets('the About dialog gets its own "check for updates" button, wherever it is opened', (tester) async {
+      final h = _Harness();
+      await tester.pumpWidget(host(h.service));
+      await tester.tap(find.text('open about'));
+      await tester.pumpAndSettle();
+      expect(find.text('업데이트 확인'), findsOneWidget);
+
+      await tester.tap(find.text('업데이트 확인'));
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('최신 버전입니다'), findsOneWidget); // 가짜 업데이터의 기본 결과
+    });
+
+    testWidgets('no scope (or no service) → no button', (tester) async {
+      await tester.pumpWidget(host(null));
+      await tester.tap(find.text('open about'));
+      await tester.pumpAndSettle();
+      expect(find.text('업데이트 확인'), findsNothing);
     });
   });
 

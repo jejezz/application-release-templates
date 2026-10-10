@@ -107,7 +107,7 @@
 - **`app` 이름**은 `AppIdentity.repositoryUrl` 의 마지막 경로(저장소 이름)입니다 — 따로 적을 것이 없습니다.
 - 릴리스에 `SHA256SUMS.txt` 가 없거나 파일 이름이 [packaging.md](../conventions/packaging.md) §1 을 따르지 않으면 서버가 자동 설치를 막고 "릴리스 페이지에서 받기" 로 안내합니다.
 - **macOS 샌드박스:** 규약 앱은 `com.apple.security.app-sandbox = false` 입니다 (portside · dove-zip). `flutter create` 의 기본(샌드박스 켜짐, 네트워크 권한 없음)을 그대로 쓰면 업데이트 확인이 연결되지 않습니다 — 샌드박스를 켠 채로 둔다면 `com.apple.security.network.client` 가 필요하고, DMG 열기(`open`)는 따로 확인해야 합니다.
-- 저장하지 않은 작업이 있는 앱은 `UpdateService.create()` 대신 직접 만들어 `quitApp` 에 정리 후 종료 함수를 넘깁니다 (기본은 `exit(0)`).
+- 종료는 정식 종료(`exitApplication(cancelable)`)라 앱의 `didRequestAppExit` 를 거칩니다 — 종료 직전에 할 정리(로그 flush · 저장)는 거기에 둡니다. 다르게 하려면 `UpdateService.create()` 대신 직접 만들어 `quitApp` 을 넘깁니다.
 - 시작 시 확인은 첫 화면이 뜬 뒤 5초 뒤에 하고, 실패하면 아무것도 띄우지 않습니다. 수동 "업데이트 확인" 은 항상 결과를 알려 줍니다.
 
 ## 검증

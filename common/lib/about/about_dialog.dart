@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../app_identity.dart';
 import '../l10n/app_localizations.dart';
+import '../update/update_scope.dart';
 
 /// 정보 창을 연다. 앱 바의 정보 버튼, macOS 앱 메뉴의 "About", 트레이
 /// 메뉴가 모두 이 함수를 부른다 (about-dialog.md §1).
@@ -29,6 +30,10 @@ Future<void> showAppAboutDialog(
   // 버전은 실제 빌드에서 읽는다 — 코드에 적어 두면 pubspec과 어긋난다.
   final info = await PackageInfo.fromPlatform();
   if (!context.mounted) return;
+
+  // UpdateScope 가 있으면 "업데이트 확인" 단추를 스스로 붙인다 (conventions/updating.md).
+  final updates = UpdateScope.maybeOf(context);
+  onCheckForUpdates ??= updates == null ? null : () => updates.checkManually(context);
 
   await showDialog<void>(
     context: context,
