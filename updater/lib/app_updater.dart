@@ -5,6 +5,7 @@ export 'src/cancel.dart';
 export 'src/client.dart' show AppUpdater, ProgressCallback;
 export 'src/errors.dart';
 export 'src/installer.dart';
+export 'src/installers.dart';
 export 'src/models.dart';
 export 'src/platform.dart';
 export 'src/policy.dart';

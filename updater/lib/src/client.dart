@@ -331,6 +331,22 @@ class AppUpdater {
     }
   }
 
+  /// Deletes download folders left behind by earlier runs (a Windows installer
+  /// cannot remove its own file; a cancelled run may leave one). Call at start.
+  Future<void> cleanUpOldDownloads({Duration olderThan = const Duration(days: 1)}) async {
+    final root = _tempRoot ?? Directory.systemTemp;
+    final cutoff = DateTime.now().subtract(olderThan);
+    try {
+      await for (final e in root.list(followLinks: false)) {
+        if (e is Directory && p.basename(e.path).startsWith('app_updater_') && (await e.stat()).modified.isBefore(cutoff)) {
+          await _deleteQuietly(e);
+        }
+      }
+    } on FileSystemException {
+      // Nothing to clean, or not allowed to look — not worth a failure.
+    }
+  }
+
   void close() {
     if (_ownsClient) _http.close();
   }

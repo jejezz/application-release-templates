@@ -35,6 +35,24 @@ dart run tool/live_check.dart https://<서버>/repos portside-flutter 0.1.0   # 
 
 ## 상태
 
-- ✅ 버전 비교 · `check` · `download` · 정책(`UpdatePolicy`) · 시험 31건
-- ⬜ OS 별 installer (macOS DMG 열기 · Windows · Linux) — `UpdateInstaller` 인터페이스만 있음
+- ✅ 버전 비교 · `check` · `download` · 정책(`UpdatePolicy`) · OS 별 installer · 시험 42건
 - ⬜ UI 템플릿 (`common/lib/update/`) · ARB 문구
+- ⬜ 실제 Windows · Linux 기기에서의 확인 (아래)
+
+## 설치 (installer)
+
+macOS 와 Windows 는 **내려받은 파일 자체가 설치 프로그램**이라, installer 는 파일을 OS 방식으로 열어 줄 뿐입니다. 압축을 풀어야 하는 Linux 만 코드가 있습니다.
+
+| OS | `install()` 이 하는 일 | 결과 |
+|---|---|---|
+| macOS | `open <dmg>` — 사용자가 Applications 로 끌어다 놓음. 실행 중인 앱을 몰래 교체하지 않음 | `openedForUser` (앱은 계속 실행) |
+| Windows | `explorer.exe <setup.exe>` — 셸이 열어서 UAC 를 띄움. `Process.start` 로 .exe 를 직접 띄우면 관리자 권한을 요구하는 설치 프로그램은 오류 740 으로 시작되지 않음. Inno 의 고정 `AppId` 로 제자리 업그레이드 | `installerStarted` (**앱은 곧 종료**) |
+| Linux | tar.gz 를 풀어 **지금** 검증(폴더 하나 · `install.sh` 가 압축 안에 있음 · 앱 ID 는 `share/applications/<id>.desktop` 에서). 설치는 **앱이 종료된 뒤** 분리된 `sh` 가: 종료 대기 → `bash install.sh` (`~/.local`, 권한 불필요) → `gtk-launch <앱 ID>` → 임시 폴더 삭제 | `installerStarted` (**앱은 곧 종료**) |
+
+- 프로세스 실행은 `CommandRunner` 로 주입합니다 (시험에서는 가짜). `platformInstaller(PlatformInfo.current())` 가 OS 에 맞는 것을 고릅니다.
+- `AppUpdater(installer: …)` 를 **명시**해야 설치가 됩니다 (기본값 없음 — 시험이 실제로 파일을 열지 않게).
+- Linux 의 설치 자체는 앱 종료 후라 실패해도 앱이 알릴 수 없습니다. 압축 해제 · 구조 검사까지는 종료 전에 오류로 알립니다.
+- `AppUpdater.cleanUpOldDownloads()` — 시작할 때 부르면 하루 넘은 `app_updater_*` 임시 폴더를 지웁니다 (Windows 설치 프로그램은 자기 파일을 지우지 못함).
+
+**macOS 에서 확인한 것:** 모든 시험 + Linux 헬퍼를 실제 `sh`/`bash` 로 실행(종료 대기 · 설치 · 재실행 호출 · 정리).
+**아직 못 한 것:** 실제 Windows(UAC 와 `explorer.exe` 동작), 실제 Linux 데스크톱(`gtk-launch`).
