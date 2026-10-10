@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:<package>/about/about_dialog.dart';
+import 'package:<package>/app_identity.dart';
 import 'package:<package>/l10n/app_localizations.dart';
 import 'package:<package>/update/update_dialogs.dart';
 import 'package:<package>/update/update_service.dart';
@@ -231,7 +232,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
       await agree(tester);
-      await tester.tap(find.text('Sample App 종료'));
+      await tester.tap(find.text('${AppIdentity.displayName} 종료'));
       await tester.pumpAndSettle();
       expect(h.quits, 1);
     });

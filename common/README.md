@@ -95,8 +95,9 @@
        git:
          url: https://github.com/jejezz/application-release-templates
          path: updater
-         ref: conventions-v1   # 이 템플릿과 같은 태그
+         ref: updater-v0.1.0   # 업데이트 코드가 들어 있는 태그. conventions-v1 은 그보다 앞선 커밋이라 쓰지 않는다
    ```
+   `updater/` 를 바꿀 때마다 새 태그(`updater-v0.1.1` …)를 달고, 앱은 그 태그로 올립니다 (git 의존성은 `ref` 를 고정해야 빌드가 재현됩니다).
 2. `lib/update/` 와 `app_identity.dart` 의 `updateServerUrl` · `updateAppId` 를 복사하고, `common_*.arb` 의 `update*` 키를 앱 ARB 에 합칩니다.
 3. `main.dart` 처럼 연결합니다: `UpdateService.create()` → `startAutomaticCheck(navigatorKey)`,
    정보 창과 macOS 메뉴에 `onCheckForUpdates` (정보 창 · `AppMenuBar`).
