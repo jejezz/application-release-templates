@@ -10,6 +10,7 @@
 | [`lib/settings/`](lib/settings/) | `lib/settings/` | 테마·언어 저장과 전환 메뉴 — [theming.md](../conventions/theming.md) §3, [localization.md](../conventions/localization.md) §3–5 |
 | [`lib/about/app_menu_bar.dart`](lib/about/app_menu_bar.dart) | `lib/about/app_menu_bar.dart` | macOS 앱 메뉴 About — [about-dialog.md](../conventions/about-dialog.md) §1 |
 | [`test/`](test/) | `test/` (`<package>`를 바꿈) | 정보 창·설정 테스트 |
+| [`lib/update/`](lib/update/) | `lib/update/` | 업데이트 알림 · 내려받기 · 설치 안내 — 아래 '업데이트' 절, `../updater/` 패키지 |
 | [`lib/app_identity.dart`](lib/app_identity.dart) | `lib/app_identity.dart` | [identity.md](../conventions/identity.md) |
 | [`lib/about/about_dialog.dart`](lib/about/about_dialog.dart) | `lib/about/about_dialog.dart` | [about-dialog.md](../conventions/about-dialog.md) |
 | [`lib/about/extra_licenses.dart`](lib/about/extra_licenses.dart) | `lib/about/extra_licenses.dart` | [licensing.md](../conventions/licensing.md) §2 |
@@ -82,6 +83,32 @@
    이미지로 채워져 첫 릴리스 검사를 통과합니다 (캡처로 바꿀 때까지 경고). 스크린샷과 데모 GIF 만드는
    순서는 [readme-guide.md](../conventions/readme-guide.md)의 "도구" 절에 있습니다.
 
+## 업데이트 (데스크톱 앱)
+
+앱 시작 후 하루 1회 서버에 새 버전을 묻고, 있으면 알려서 **동의를 받은 뒤** 내려받아 SHA-256 을 검증하고 설치합니다.
+로직은 [`../updater/`](../updater/) 패키지(순수 Dart), 화면과 연결은 `lib/update/` 이고 문구는 ARB 의 `update*` 키입니다.
+
+1. `pubspec.yaml` 에 패키지를 더합니다 (`flutter pub add shared_preferences package_info_plus url_launcher` 는 위에서 이미).
+   ```yaml
+   dependencies:
+     app_updater:
+       git:
+         url: https://github.com/jejezz/application-release-templates
+         path: updater
+         ref: conventions-v1   # 이 템플릿과 같은 태그
+   ```
+2. `lib/update/` 와 `app_identity.dart` 의 `updateServerUrl` · `updateAppId` 를 복사하고, `common_*.arb` 의 `update*` 키를 앱 ARB 에 합칩니다.
+3. `main.dart` 처럼 연결합니다: `UpdateService.create()` → `startAutomaticCheck(navigatorKey)`,
+   정보 창과 macOS 메뉴에 `onCheckForUpdates` (정보 창 · `AppMenuBar`).
+4. 테스트 `test/update_test.dart` 의 `<package>` 를 바꿉니다 (가짜 업데이터라 네트워크 불필요).
+
+- **서버 주소**는 `AppIdentity.updateServerUrl` 기본값이고 `--dart-define=UPDATE_SERVER=https://…/repos` 로 덮어씁니다. **빈 값이면 업데이트 확인을 끕니다** (모바일 앱은 `create()` 가 null).
+- **`app` 이름**은 `AppIdentity.repositoryUrl` 의 마지막 경로(저장소 이름)입니다 — 따로 적을 것이 없습니다.
+- 릴리스에 `SHA256SUMS.txt` 가 없거나 파일 이름이 [packaging.md](../conventions/packaging.md) §1 을 따르지 않으면 서버가 자동 설치를 막고 "릴리스 페이지에서 받기" 로 안내합니다.
+- **macOS 샌드박스:** 규약 앱은 `com.apple.security.app-sandbox = false` 입니다 (portside · dove-zip). `flutter create` 의 기본(샌드박스 켜짐, 네트워크 권한 없음)을 그대로 쓰면 업데이트 확인이 연결되지 않습니다 — 샌드박스를 켠 채로 둔다면 `com.apple.security.network.client` 가 필요하고, DMG 열기(`open`)는 따로 확인해야 합니다.
+- 저장하지 않은 작업이 있는 앱은 `UpdateService.create()` 대신 직접 만들어 `quitApp` 에 정리 후 종료 함수를 넘깁니다 (기본은 `exit(0)`).
+- 시작 시 확인은 첫 화면이 뜬 뒤 5초 뒤에 하고, 실패하면 아무것도 띄우지 않습니다. 수동 "업데이트 확인" 은 항상 결과를 알려 줍니다.
+
 ## 검증
 
 이 폴더의 파일은 `flutter create`로 만든 빈 앱(Flutter 3.47.1)에 위 순서대로
@@ -92,6 +119,9 @@
 - `generate_icons.py`: 5개 플랫폼 아이콘 생성
 - `bump-version.sh`: patch, minor, major, build, 프리릴리스, 더러운 작업
   트리 거부, `Cargo.toml` 동시 갱신
+
+업데이트(`lib/update/`)는 같은 방식으로 `flutter analyze` 경고 없음, 위젯 테스트 25개 통과(기존 7개 포함), `flutter build macos --debug` 성공을 확인했습니다 (2026-10-10).
+실제 Windows · Linux 기기와 실제 서버에서의 내려받기 · 설치는 시범 앱에서 확인합니다.
 
 테마·설정·메뉴 코드(`lib/theme/`, `lib/settings/`, `lib/about/app_menu_bar.dart`,
 `lib/main.dart`)는 빈 앱에 적용해 `flutter analyze` 경고 없음, 테스트 7개

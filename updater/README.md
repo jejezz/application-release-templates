@@ -36,7 +36,7 @@ dart run tool/live_check.dart https://<서버>/repos portside-flutter 0.1.0   # 
 ## 상태
 
 - ✅ 버전 비교 · `check` · `download` · 정책(`UpdatePolicy`) · OS 별 installer · 시험 42건
-- ⬜ UI 템플릿 (`common/lib/update/`) · ARB 문구
+- ✅ UI 템플릿 (`common/lib/update/`) · ARB 문구 · 정보 창 / macOS 메뉴 연결 · 위젯 시험 (`../common/README.md` '업데이트' 절)
 - ⬜ 실제 Windows · Linux 기기에서의 확인 (아래)
 
 ## 설치 (installer)
