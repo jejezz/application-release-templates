@@ -12,9 +12,11 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' show AppExitType;
 
 import 'package:app_updater/app_updater.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show ServicesBinding;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -68,8 +70,11 @@ class UpdateService {
 
   static String _currentOs() => Platform.isMacOS ? 'macos' : (Platform.isWindows ? 'windows' : 'linux');
 
-  // 저장하지 않은 상태가 있는 앱은 create 대신 직접 만들어 quitApp 을 넘긴다.
-  static Future<void> _exitApp() async => exit(0);
+  // 정식 종료: 앱의 WidgetsBindingObserver.didRequestAppExit 를 거친 뒤 끝난다. 종료 직전에 정리할 것(로그 flush,
+  // 저장)이 있는 앱은 거기서 하면 된다. `exit(0)` 은 그것을 건너뛰므로 쓰지 않는다.
+  static Future<void> _exitApp() async {
+    await ServicesBinding.instance.exitApplication(AppExitType.cancelable);
+  }
 
   static Future<void> _launch(Uri url) async {
     await launchUrl(url, mode: LaunchMode.externalApplication);
