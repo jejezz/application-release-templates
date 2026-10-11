@@ -63,7 +63,7 @@ localeResolutionCallback: (device, supported) =>
 
 ### 4. 전환 UI
 
-- **데스크톱**: 앱 바의 언어 아이콘을 누르면 체크 표시가 있는 팝업 메뉴가
+- **데스크톱**: 앱 바의 언어 아이콘(`Icons.language_rounded`)을 누르면 체크 표시가 있는 팝업 메뉴가
   열립니다 (allwinner 방식).
   - 항목은 `시스템 설정 따르기 / System`, `한국어`, `English`입니다.
   - 언어 이름은 **그 언어로** 씁니다. 잘못 선택해서 읽을 수 없는 언어가
