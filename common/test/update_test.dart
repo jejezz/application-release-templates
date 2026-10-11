@@ -50,8 +50,9 @@ class _FakeUpdater implements AppUpdater {
   String get appId => 'sample-flutter';
   @override
   UpdateInstaller? get installer => null;
+  List<String> prefixes = const [];
   @override
-  List<String> get downloadUrlPrefixes => const [];
+  List<String> get downloadUrlPrefixes => prefixes;
   @override
   Duration get requestTimeout => const Duration(seconds: 1);
 
@@ -90,11 +91,12 @@ class _FakeUpdater implements AppUpdater {
 }
 
 class _Harness {
-  _Harness({String os = 'macos', bool Function()? isBusy}) {
+  _Harness({String os = 'macos', bool Function()? isBusy, bool browserDownload = false}) {
     service = UpdateService(
       updater: updater,
       policy: policy,
       os: os,
+      browserDownload: browserDownload,
       isBusy: isBusy,
       idlePollInterval: const Duration(milliseconds: 20),
       startupDelay: Duration.zero,
@@ -257,6 +259,28 @@ void main() {
       expect(h.updater.installs, 1);
       expect(find.text('설치 창이 열렸습니다'), findsOneWidget);
       expect(h.quits, 0); // macOS 는 앱을 종료하지 않는다
+    });
+
+    testWidgets('sandboxed macOS: the browser downloads, the app never does (a file the sandbox writes is refused by Gatekeeper)', (tester) async {
+      final h = _Harness(browserDownload: true)
+        ..updater.prefixes = const ['https://github.com/']
+        ..updater.checkResult = UpdateAvailable(_info());
+      await _check(tester, h);
+      await agree(tester);
+      expect(h.updater.downloads, 0);
+      expect(h.updater.installs, 0);
+      expect(h.opened, [Uri.parse('https://github.com/jejezz/sample-flutter/releases/download/v1.1.0/x.dmg')]);
+      expect(find.text('브라우저에서 내려받습니다'), findsOneWidget);
+      expect(h.quits, 0);
+    });
+
+    testWidgets('sandboxed macOS: an address outside the allowed prefixes opens the release page instead', (tester) async {
+      final h = _Harness(browserDownload: true)
+        ..updater.prefixes = const ['https://example.invalid/']
+        ..updater.checkResult = UpdateAvailable(_info());
+      await _check(tester, h);
+      await agree(tester);
+      expect(h.opened, [Uri.parse('https://github.com/jejezz/sample-flutter/releases/tag/v1.1.0')]);
     });
 
     testWidgets('Windows: the app quits only when the person says so', (tester) async {
