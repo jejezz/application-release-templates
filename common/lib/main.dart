@@ -20,6 +20,7 @@ import 'settings/settings_menus.dart';
 import 'theme/app_theme.dart';
 import 'update/update_scope.dart';
 import 'update/update_service.dart';
+import 'window/focus_tint.dart';
 
 final bool _isDesktop = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
 
@@ -150,6 +151,7 @@ class HomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: const FocusTint(),
         title: const Text(AppIdentity.displayName),
         actions: [
           const ThemeMenuButton(),
