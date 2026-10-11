@@ -46,6 +46,8 @@ macOS 와 Windows 는 **내려받은 파일 자체가 설치 프로그램**이�
 | OS | `install()` 이 하는 일 | 결과 |
 |---|---|---|
 | macOS | `open <dmg>` — 사용자가 Applications 로 끌어다 놓음. 실행 중인 앱을 몰래 교체하지 않음 | `openedForUser` (앱은 계속 실행) |
+
+> **샌드박스 앱 주의 (macOS):** App Sandbox 앱이 직접 내려받은 DMG는 "샌드박스가 만든 파일"(`com.apple.quarantine: 0086;…;<앱 이름>;`)로 표시되어, 그 안의 앱이 Gatekeeper에 거부됩니다(`spctl`: `File created by an AppSandbox, exec/open not allowed`, 화면에는 "응용 프로그램을 열 수 없습니다"). 서명·공증이 아니라 파일을 만든 주체의 문제입니다. 그래서 `common/lib/update/update_service.dart`는 `APP_SANDBOX_CONTAINER_ID`가 있으면 내려받기를 하지 않고 릴리스 파일 주소를 브라우저로 엽니다. 샌드박스가 꺼진 앱은 그대로 앱이 내려받습니다.
 | Windows | `explorer.exe <setup.exe>` — 셸이 열어서 UAC 를 띄움. `Process.start` 로 .exe 를 직접 띄우면 관리자 권한을 요구하는 설치 프로그램은 오류 740 으로 시작되지 않음. Inno 의 고정 `AppId` 로 제자리 업그레이드 | `installerStarted` (**앱은 곧 종료**) |
 | Linux | tar.gz 를 풀어 **지금** 검증(폴더 하나 · `install.sh` 가 압축 안에 있음 · 앱 ID 는 `share/applications/<id>.desktop` 에서). 설치는 **앱이 종료된 뒤** 분리된 `sh` 가: 종료 대기 → `bash install.sh` (`~/.local`, 권한 불필요) → `gtk-launch <앱 ID>` → 임시 폴더 삭제 | `installerStarted` (**앱은 곧 종료**) |
 
