@@ -84,6 +84,11 @@ dependencies:
 정합니다. 화면마다 `AppBar(toolbarHeight: …)`를 따로 주지 않습니다 — 앱마다,
 화면마다 타이틀 바 높이가 달라 보이는 원인이 됩니다.
 
+창이 포커스를 받으면 앱 바 배경이 서서히 강조색으로 물들고 잃으면 빠집니다
+(`lib/window/focus_tint.dart`, `AppBar(flexibleSpace: const FocusTint())`). 어느
+창이 활성인지 한눈에 보이게 하려는 것이며, OS 타이틀 바와 신호등 버튼은
+건드리지 않습니다. 모든 데스크톱 앱 바에 같은 위젯을 씁니다.
+
 ### 5. 창 (데스크톱)
 
 - `window_manager`로 크기, 최소 크기, 제목을 정합니다. Swift/C++ 러너
