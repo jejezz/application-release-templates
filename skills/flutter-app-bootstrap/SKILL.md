@@ -93,6 +93,13 @@ an empty-state home screen. Don't reinvent any of these; adjust only:
 - Window size: 1200×720 for work apps, 960×640 for small utilities
   (`ui-ux.md` §5). Leave the empty-state button disabled until a feature exists.
 - `test/*_test.dart`: replace `<package>`.
+- App bar height comes from `AppBarTheme.toolbarHeight` in the copied
+  `app_theme.dart` (44 desktop / 56 mobile); never pass `toolbarHeight` to an
+  individual `AppBar`.
+- App bar icons: when you add buttons next to `theme | language | About`, give
+  them all the same size (20 by default, `ui-ux.md` §4). Set it once with an
+  `IconButtonTheme` `iconSize` rather than per button, so no button is left at
+  the default 24. The language button uses `Icons.language_rounded`.
 
 Assets:
 - **Icon**: glyph at `assets/icon/source_glyph.png`, then

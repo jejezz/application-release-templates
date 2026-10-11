@@ -563,6 +563,12 @@ class Audit:
             self.add('ui.window', a, 'fail', 'window size not set with window_manager', 'WindowOptions(size, minimumSize, title)', doc)
         if 'useMaterial3: false' in lib:
             self.add('ui.material3', a, 'warn', 'useMaterial3: false', 'Saturn theme assumes M3', doc)
+        if re.search(r'AppBar\([^;]*?toolbarHeight\s*:', lib, re.S):
+            self.add('ui.appbar-height', a, 'warn', 'AppBar(toolbarHeight: …) set per screen',
+                     'set AppBarTheme.toolbarHeight once in app_theme.dart (44 desktop / 56 mobile)', doc)
+        if 'Icons.translate_rounded' in lib:
+            self.add('ui.language-icon', a, 'warn', 'language menu uses the heavy Icons.translate_rounded',
+                     'Icons.language_rounded (looks smaller than the other app bar icons)', doc)
 
     def readme(self) -> None:
         a, doc = 'readme', 'readme-guide.md'
