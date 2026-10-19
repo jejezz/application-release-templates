@@ -76,6 +76,11 @@ Then the names and copyright (`identity.md` §2, §4):
   desktop (the first tag is the pre-release `v0.1.0-rc.1`) or `0.1.0+1` for
   mobile (`versioning.md` §2).
 - `LICENSE`: MIT, `Copyright (c) <year> Jongyun Ahn` (`licensing.md` §1).
+- macOS Debug id: in `macos/Runner.xcodeproj/project.pbxproj`, add
+  `PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).dev";` to the Runner target's
+  **Debug** build settings only (`identity.md` §7), so debug builds never share
+  TCC permissions with the installed release. If the app talks to the LAN, add
+  `NSLocalNetworkUsageDescription` to `macos/Runner/Info.plist`.
 
 ## 3. Shared files and skeleton (`common/README.md`)
 

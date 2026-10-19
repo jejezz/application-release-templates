@@ -110,3 +110,27 @@ Windows 리소스(`Runner.rc`)와 Inno Setup 스크립트는 파일 인코딩 �
 - macOS: `~/Library/Application Support/<FileName>`
 - Windows: `%APPDATA%\<FileName>`
 - Linux: `${XDG_CONFIG_HOME:-~/.config}/<FileName>`
+
+### 7. macOS 디버그 빌드는 `.dev` 식별자
+
+`flutter run` · `flutter build macos --debug` 로 만든 앱은 릴리스 앱과 **같은
+bundle id 를 쓰면 안 됩니다.** `build/` 폴더, 워크트리, 임시 폴더, 마운트한
+DMG 가 모두 같은 id 로 LaunchServices 에 등록되고, macOS 는 로컬 네트워크 ·
+파일 접근 같은 권한(TCC)을 그 id 로 관리합니다. 서명이 다른 복사본이 여러
+개 쌓이면 시스템 설정에는 켜져 있는데 실제로는 막히는 상태가 생깁니다
+(예: LAN 의 SSH 서버에 `SocketException: No route to host, errno = 65`).
+OFF → ON 으로 다시 켜야 풀립니다.
+
+- 규칙: **Runner 타깃의 Debug 구성에서만** `PRODUCT_BUNDLE_IDENTIFIER` 를
+  `$(inherited).dev` 로 덮어씁니다 (`macos/Runner.xcodeproj/project.pbxproj` 의
+  Runner `Debug` 빌드 설정, `INFOPLIST_FILE` 근처에 한 줄). Release · Profile 과
+  `AppInfo.xcconfig` 는 그대로 둡니다 (§5: 릴리스 id 는 바꾸지 않는다).
+  결과 id 는 `art.zoomon.<패키지>.dev` 입니다.
+- 디버그 빌드는 설정이 따로 저장되어 릴리스 앱의 설정(주소록 등)이 보이지
+  않습니다. 의도한 동작입니다.
+- 로컬 네트워크에 접속하는 앱(SSH, SIP, 시리얼 over LAN 등)은
+  `macos/Runner/Info.plist` 에 `NSLocalNetworkUsageDescription` 도 둡니다.
+  없으면 macOS 가 허용 팝업을 띄우지 않고 사설 IP 접속을 조용히 막을 수
+  있습니다. 문구는 앱이 접속하는 대상을 한국어로 적습니다.
+- iOS 는 시뮬레이터 · 기기 빌드가 같은 id 로 충돌하는 문제가 없어 해당하지
+  않습니다.
