@@ -67,9 +67,11 @@ env:
 ### 4. 릴리스 제목과 노트
 
 - 제목은 `<표시 이름> v1.4.2`입니다 (예: `Dove Zip v1.4.2`).
-- 노트는 `.github/release-notes-header.md`(설치 안내) 뒤에
-  `--generate-notes`를 붙여 만듭니다. daylight에서 쓰는 방식입니다.
-  헤더에는 다음을 적습니다.
+- 노트는 GitHub가 만든 "What's Changed"(`releases/generate-notes` API)
+  **뒤에** `.github/release-notes-header.md`(설치 안내)를 붙여 만듭니다.
+  앱의 업데이트 팝업은 본문 앞부분만 보여 주므로 변경 내용이 위에 와야 합니다.
+  (`gh release create --generate-notes`는 `--notes-file` 뒤에 붙으므로 순서를
+  바꿀 수 없어 API로 따로 생성합니다.) 이 파일에는 다음을 적습니다.
   - OS별로 어떤 파일을 받아야 하는지
   - Windows SmartScreen 경고를 넘기는 방법 (코드 서명 전까지)
   - macOS 최소 버전
