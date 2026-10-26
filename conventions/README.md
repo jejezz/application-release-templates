@@ -35,6 +35,7 @@
 | [icons.md](icons.md) | 앱 아이콘 원본과 생성 파이프라인, 앱 안 UI 아이콘 테마 |
 | [licensing.md](licensing.md) | 앱 라이선스, 서드파티 고지, 폰트/아이콘 저작자 표시 |
 | [ui-ux.md](ui-ux.md) | Saturn 디자인 언어, 토큰, 밀도, 창 크기, 상태 화면, 단축키, 입력 |
+| [window-placement.md](window-placement.md) | 창 시작 위치: 듀얼 모니터·배율이 다른 Windows에서 `center: true`를 쓰지 않는 이유와 `placeWindowAtStartup` |
 | [fonts.md](fonts.md) | SeoulNamsan, 대체 글꼴, 고정폭 글꼴, 사용자 콘텐츠 글꼴 |
 | [localization.md](localization.md) | gen-l10n, 한국어 기준 + 영어, 언어 선택 방식, 설정 저장 키, 날짜·숫자 형식 |
 | [theming.md](theming.md) | 시스템/라이트/다크, 색 토큰, 전환 UI, 창 테두리 밝기 |

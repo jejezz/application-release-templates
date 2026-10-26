@@ -95,12 +95,16 @@ dependencies:
   코드에서 크기를 정하지 않습니다.
   ```dart
   const WindowOptions(size: Size(1200, 720), minimumSize: Size(960, 600),
-      center: true, title: '<표시 이름>');
+      center: false, title: '<표시 이름>');
   ```
+  시작 위치는 `center: true` 대신 `placeWindowAtStartup`으로 정합니다 — 모니터마다
+  배율이 다른 Windows 듀얼 모니터에서 `center: true`가 창을 화면 밖에 놓습니다
+  ([window-placement.md](window-placement.md)).
 - 기본 크기: 목록·편집기 같은 작업 앱은 1200×720, 작은 유틸리티는
   960×640. 최소 크기는 **960×600 이하**로 둡니다 (1366×768 노트북에서
   잘리지 않도록).
-- 마지막 창 크기와 위치를 기억하는 것은 선택 사항입니다.
+- 마지막 창 크기와 위치를 기억하는 것은 선택 사항입니다. 마지막에 쓰던 모니터를
+  기억하는 것은 [window-placement.md](window-placement.md)의 규칙을 따릅니다.
 - 제목 표시줄은 OS 기본을 씁니다. 창 테두리 색을 테마와 맞추는 방법은
   [theming.md](theming.md)에 있습니다.
 
