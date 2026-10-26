@@ -9,6 +9,7 @@
 | [`lib/theme/app_theme.dart`](lib/theme/app_theme.dart) | `lib/theme/app_theme.dart` | [ui-ux.md](../conventions/ui-ux.md), [theming.md](../conventions/theming.md), [fonts.md](../conventions/fonts.md) |
 | [`lib/settings/`](lib/settings/) | `lib/settings/` | 테마·언어 저장과 전환 메뉴 — [theming.md](../conventions/theming.md) §3, [localization.md](../conventions/localization.md) §3–5 |
 | [`lib/window/focus_tint.dart`](lib/window/focus_tint.dart) | `lib/window/focus_tint.dart` | 창 포커스에 따라 앱 바가 물드는 효과 — [ui-ux.md](../conventions/ui-ux.md) §4 |
+| [`lib/window/window_placement.dart`](lib/window/window_placement.dart) | `lib/window/window_placement.dart` | 시작할 때 창 위치(듀얼 모니터·배율이 다른 Windows) — [window-placement.md](../conventions/window-placement.md) |
 | [`lib/about/app_menu_bar.dart`](lib/about/app_menu_bar.dart) | `lib/about/app_menu_bar.dart` | macOS 앱 메뉴 About — [about-dialog.md](../conventions/about-dialog.md) §1 |
 | [`test/`](test/) | `test/` (`<package>`를 바꿈) | 정보 창·설정 테스트 |
 | [`lib/update/`](lib/update/) | `lib/update/` | 업데이트 알림 · 내려받기 · 설치 안내 — 아래 '업데이트' 절, `../updater/` 패키지 |
@@ -49,7 +50,7 @@
 4. **pubspec.yaml**
    ```bash
    flutter pub add package_info_plus url_launcher shared_preferences intl:any 'flutter_localizations:{"sdk":"flutter"}'
-   flutter pub add window_manager      # 데스크톱 앱
+   flutter pub add window_manager screen_retriever   # 데스크톱 앱
    ```
    ```yaml
    flutter:
