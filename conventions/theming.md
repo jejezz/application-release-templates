@@ -72,6 +72,10 @@
 
 ### 3. 전환 UI
 
+> **가능하면** 아래 앱 바 팝업 메뉴 대신 [settings.md](settings.md)의 **설정 창**에 테마 선택(`SegmentedButton`)을
+> 둡니다. 설정 창에는 색 구성(color theme)도 함께 둡니다. 설정 창을 쓰는 앱은 아래 "데스크톱" 항목과
+> 앱 바 순서 대신 settings.md를 따릅니다.
+
 [localization.md](localization.md)의 언어 전환과 **같은 방식**으로 만듭니다.
 
 - 기준 구현: [`common/lib/settings/`](../common/lib/settings/) —
@@ -83,7 +87,14 @@
     `dark_mode` (Material Symbols Rounded).
 - **모바일**: 설정 화면의 `SegmentedButton`을 씁니다 (saturn 방식).
 - 저장 키는 `theme_mode`이고, 값은 `ThemeMode.name`입니다.
-- 앱 바 오른쪽 끝의 버튼 순서는 `… | 테마 | 언어 | 정보`입니다.
+- 앱 바 오른쪽 끝의 버튼 순서는 `… | 테마 | 언어 | 정보`입니다. 설정 창을 쓰면 `… | 설정 | 정보`입니다.
+
+### 3-1. 색 구성 (color theme, 선택)
+
+밝기와 별개로 주색 계열을 고르게 할 수 있습니다. **가능하면** 설정 창에 함께 둡니다. 저장 키는
+`theme_palette`(`ColorPalette.name`), 기본은 `saturn`(위 §2 팔레트)입니다. 종류·색 값·구현은
+[settings.md](settings.md)를 따르고, 위젯은 색 상수 대신 `colorScheme`·`dividerColor`에서 읽습니다(§2의
+"직접 쓰지 않습니다"와 같은 규칙).
 
 ### 4. 창 테두리와 시스템 UI
 

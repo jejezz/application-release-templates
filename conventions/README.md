@@ -38,6 +38,7 @@
 | [window-placement.md](window-placement.md) | 창 시작 위치: 듀얼 모니터·배율이 다른 Windows에서 `center: true`를 쓰지 않는 이유와 `placeWindowAtStartup` |
 | [fonts.md](fonts.md) | SeoulNamsan, 대체 글꼴, 고정폭 글꼴, 사용자 콘텐츠 글꼴 |
 | [localization.md](localization.md) | gen-l10n, 한국어 기준 + 영어, 언어 선택 방식, 설정 저장 키, 날짜·숫자 형식 |
+| [settings.md](settings.md) | 설정 창(테마·색 구성·글자 크기·언어를 한곳에), 색 구성 6종, 색을 테마에서 읽는 규칙 — **가능하면** 적용 |
 | [theming.md](theming.md) | 시스템/라이트/다크, 색 토큰, 전환 UI, 창 테두리 밝기 |
 | [readme-guide.md](readme-guide.md) | README 구성(MacBroom 기준), 영어·한국어 두 벌, 스크린샷·데모 GIF 규격, 제작·검사 도구 |
 

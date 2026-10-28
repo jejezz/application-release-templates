@@ -63,6 +63,9 @@ localeResolutionCallback: (device, supported) =>
 
 ### 4. 전환 UI
 
+> **가능하면** 앱 바 팝업 메뉴 대신 [settings.md](settings.md)의 **설정 창**("언어" 구역,
+> `SegmentedButton`)에 둡니다. 그 경우 앱 바 아이콘은 두지 않습니다.
+
 - **데스크톱**: 앱 바의 언어 아이콘(`Icons.language_rounded`)을 누르면 체크 표시가 있는 팝업 메뉴가
   열립니다 (allwinner 방식).
   - 항목은 `시스템 설정 따르기 / System`, `한국어`, `English`입니다.
@@ -83,6 +86,7 @@ localeResolutionCallback: (device, supported) =>
 | `app_locale` | `ko` / `en` | 시스템 |
 | `theme_mode` | `ThemeMode.name` (`system` / `light` / `dark`) | 시스템 |
 | `text_scale` | `double` | 1.0 |
+| `theme_palette` | `ColorPalette.name` (`saturn` / `teal` / `amber` / `rose` / `slate` / `highContrast`) | `saturn` |
 
 앱 고유 설정에는 `<기능>_<이름>` 형식을 씁니다 (예: `terminal_font_family`).
 `user.theme_mode`처럼 점이 들어간 접두어는 쓰지 않습니다.
