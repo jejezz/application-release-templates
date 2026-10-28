@@ -25,14 +25,38 @@ daylight-workbench의 설정 창을 따랐습니다.
 
 ## 앱 바
 
-- 설정 아이콘(Icons8 `icons8-settings.svg`, `ToolIcon`)을 **정보 아이콘 바로 왼쪽**에 둡니다.
-  앱 바 오른쪽 끝은 `… | 설정 | 정보`입니다.
+- 설정 아이콘을 **정보 아이콘 바로 왼쪽**에 둡니다. 앱 바 오른쪽 끝은 `… | 설정 | 정보`입니다.
+  - 앱이 Icons8 아이콘을 쓰면 `icons8-settings.svg`(`ToolIcon`)를 씁니다.
+  - Icons8 설정 아이콘이 **없으면 Material 아이콘을 쓰기를 권장합니다**(`Icons.settings_outlined`,
+    다른 앱 바 아이콘이 둥근 계열이면 `Icons.settings_rounded`). 앱 바의 다른 아이콘과 같은 계열·크기(24)로
+    맞추고, 한 앱 안에서 Icons8와 Material을 섞어 쓰지 않도록 [icons.md](icons.md)를 따릅니다.
 - 이전의 `글자 크기 | 테마 | 언어` 팝업 버튼은 **가능하면** 없애고 설정 창으로 옮깁니다.
   (macOS 메뉴 막대에 "설정…"(⌘,)이 있으면 같은 창을 엽니다 — [ui-ux.md](ui-ux.md).)
 
 ## 설정 창 구성
 
-`AlertDialog` 안에 왼쪽 구역 목록 + 세로 구분선 + 오른쪽 내용을 둡니다 (너비 약 640, 높이 약 380).
+`AlertDialog` 안에 구역 목록과 내용을 둡니다. 창 크기에 따라 두 가지 배치를 씁니다.
+
+### 크기와 도킹한 창
+
+설정 창은 **앱 창보다 커질 수 없습니다.** 창을 화면 가장자리에 붙이는 도킹 모드(daylight-commander의
+한 패널 도킹: 너비 480~520, 최소 높이 480)에서는 고정 크기 640×380 다이얼로그가 넘칩니다.
+`AlertDialog` 기본 바깥 여백(가로 40)과 제목·닫기 줄이 차지하는 높이도 계산에 넣어야 합니다.
+
+| 항목 | 규칙 |
+|---|---|
+| 바깥 여백 | `insetPadding: EdgeInsets.all(16)` |
+| 너비 | `min(640, 화면 너비 − 32)` — `MediaQuery.sizeOf(context)`로 구합니다. 앱 창의 최소 너비(도킹 480)에서도 들어가야 합니다 |
+| 높이 | `clamp(160, 380)` 안에서 `화면 높이 − 32 − 150`(제목 줄 + 닫기 줄). 본문은 `SingleChildScrollView`로 스크롤합니다 |
+| 넓은 배치 | 너비 **560 이상**: 왼쪽 구역 목록(160) + 세로 구분선 + 오른쪽 내용 |
+| 좁은 배치 | 너비 **560 미만**(도킹 포함): 구역 목록을 **위쪽 한 줄**(`ChoiceChip`, 가로 스크롤)로 올리고, 가로 구분선 아래에 내용을 둡니다. 왼쪽 열을 두지 않습니다 |
+
+- 좁은 배치에서는 왼쪽 굵은 선 대신 선택된 `ChoiceChip`(`showCheckmark: false`, 앞에 구역 아이콘)으로
+  구역을 표시합니다.
+- 내용 안의 컨트롤은 좁은 폭(약 430)에서도 한 줄에 들어가거나 `Wrap`으로 줄바꿈합니다. 세 항목짜리
+  `SegmentedButton`(아이콘 + 짧은 라벨)은 들어가고, 긴 라벨이나 네 항목 이상은 `Wrap` + `ChoiceChip`을 씁니다.
+- 도킹은 한 패널 모드에서만 가능한 앱도 있으므로, 설정 창은 도킹 여부를 따로 알 필요 없이 **창 크기만** 보고
+  배치를 고릅니다.
 
 | 구역 | 내용 | 위젯 |
 |---|---|---|
@@ -41,7 +65,7 @@ daylight-workbench의 설정 창을 따랐습니다.
 | | 글자 크기 | `SegmentedButton<double>` — 작게·보통·크게 |
 | 언어 | 언어 | `SegmentedButton<String>` — 시스템·한국어·English (언어 이름은 그 언어로) |
 
-- 구역이 늘면 왼쪽 목록에 추가합니다 (workbench는 편집기·터미널 등 앱 고유 구역을 더 둠).
+- 구역이 늘면 목록(넓은 배치는 왼쪽, 좁은 배치는 위쪽 칩)에 추가합니다 (workbench는 편집기·터미널 등 앱 고유 구역을 더 둠).
   앱 고유 설정은 [localization.md](localization.md) §5의 `<기능>_<이름>` 키를 씁니다.
 - 선택한 구역은 배경을 채우지 않고 **왼쪽에 굵은 선**(3px, `primary`)으로 표시합니다.
   배경을 채우면 고대비에서 글자와 겹칩니다. 선택 안 된 줄도 같은 폭을 비워 글자가 밀리지 않게 합니다.
@@ -112,6 +136,8 @@ daylight-workbench의 설정 창을 따랐습니다.
 
 ### 테스트
 
+- 도킹 크기(`physicalSize` 480×480, `devicePixelRatio` 1)에서 `SettingsDialog`를 띄워 오버플로 예외가
+  없고, 위쪽 칩으로 구역이 바뀌는지 확인합니다.
 - 설정 창을 `Scaffold(body: SettingsDialog())`로 띄워 각 선택지를 눌러 값이 바뀌고(`AppSettings`,
   `fontScaleProvider`) `shared_preferences`에 저장되는지 확인합니다.
 - 저장된 `theme_palette`를 읽는지, `AppTheme.light/dark(palette)`의 `primary`가 해당 색인지,
