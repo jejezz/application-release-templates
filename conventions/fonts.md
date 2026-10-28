@@ -87,6 +87,8 @@ const kMonoFallback = ['SF Mono', 'Consolas', 'Cascadia Mono',
 
 ### 6. 글자 크기 조절 (선택)
 
+**가능하면** 앱 바 팝업 메뉴 대신 [settings.md](settings.md)의 설정 창("글자 크기", `SegmentedButton`)에 둡니다.
+
 daylight의 글자 크기 조절(1.0 / 1.15 / 0.9)은 **선택 사항**입니다.
 넣는다면 다음을 지킵니다.
 - 구현은 `MediaQuery.textScaler`로 합니다.
