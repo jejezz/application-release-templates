@@ -71,7 +71,10 @@
    - SeoulNamsan과 대체 글꼴 ([fonts.md](fonts.md))
    - gen-l10n ko/en과 언어 전환 ([localization.md](localization.md))
    - 시스템/라이트/다크 전환 ([theming.md](theming.md))
-   - `window_manager` 창 크기
+   - `window_manager` 창 크기·시작 위치 — **필수 확인**:
+     [window-placement.md](window-placement.md)의 `placeWindowAtStartup`을
+     쓴다. `center: true`나 저장 좌표를 그대로 `setBounds`에 넘기면 배율이
+     다른 보조 모니터에서 창이 화면 밖에 놓인다(여러 앱에서 반복 확인됨).
    - 설정 화면 ([settings-screen.md](settings-screen.md)) — 지원 플랫폼부터
      정하고 구조를 고릅니다
    - 앱 바 오른쪽 `설정 | 정보` 버튼

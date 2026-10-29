@@ -17,6 +17,13 @@
   잡히지 않습니다.
 - 앱마다 각자 고친 방식이 다릅니다(물리 픽셀 계산, 네이티브 채널, C++ 러너, 재시도
   루프). 새 앱은 아래 규칙 하나를 씁니다.
+- **2026-10-29 확인: 아직 이 규칙을 안 쓰는 앱** — daylight-workbench(자체
+  `window_state.dart`로 임시 보정만 적용), daylight-broom, daylight-pdf,
+  daylight-terminal, kamailio-sip-client, stevedore, notes2hub,
+  daylight-commander(`screen_retriever`는 쓰지만 복원 시 배율 보정 없음).
+  기존 저장 좌표 키(`window_state` 등)를 쓰는 앱은 이 문서의 4번(모니터
+  이름만 저장)으로 바꿀 때 마이그레이션이 필요하다 — 옛 키는 무시하고
+  새로 시작해도 된다(창 위치는 편의 기능이라 데이터 손실이 아니다).
 
 ## 규칙
 
