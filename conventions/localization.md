@@ -85,6 +85,7 @@ localeResolutionCallback: (device, supported) =>
 | `app_locale` | `ko` / `en` | 시스템 |
 | `theme_mode` | `ThemeMode.name` (`system` / `light` / `dark`) | 시스템 |
 | `text_scale` | `double` | 1.0 |
+| `theme_palette` | `ColorPalette.name` (`saturn` / `teal` / `amber` / `rose` / `slate` / `highContrast`) | `saturn` |
 
 앱 고유 설정에는 `<기능>_<이름>` 형식을 씁니다 (예: `terminal_font_family`).
 `user.theme_mode`처럼 점이 들어간 접두어는 쓰지 않습니다.
