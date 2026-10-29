@@ -39,6 +39,7 @@
 | [fonts.md](fonts.md) | SeoulNamsan, 대체 글꼴, 고정폭 글꼴, 사용자 콘텐츠 글꼴 |
 | [localization.md](localization.md) | gen-l10n, 한국어 기준 + 영어, 언어 선택 방식, 설정 저장 키, 날짜·숫자 형식 |
 | [theming.md](theming.md) | 시스템/라이트/다크, 색 토큰, 전환 UI, 창 테두리 밝기 |
+| [settings-screen.md](settings-screen.md) | 설정 화면 구조(데스크톱 다이얼로그 vs 모바일 전체 페이지), "외형" 섹션 고정 항목, 색 구성 팔레트 |
 | [readme-guide.md](readme-guide.md) | README 구성(MacBroom 기준), 영어·한국어 두 벌, 스크린샷·데모 GIF 규격, 제작·검사 도구 |
 
 ## 새 앱 시작 체크리스트
@@ -70,7 +71,9 @@
    - gen-l10n ko/en과 언어 전환 ([localization.md](localization.md))
    - 시스템/라이트/다크 전환 ([theming.md](theming.md))
    - `window_manager` 창 크기
-   - 앱 바 오른쪽 `테마 | 언어 | 정보` 버튼
+   - 설정 화면 ([settings-screen.md](settings-screen.md)) — 지원 플랫폼부터
+     정하고 구조를 고릅니다
+   - 앱 바 오른쪽 `설정 | 정보` 버튼
 8. **정보 창** — [about-dialog.md](about-dialog.md) 형식대로. 버전은
    `package_info_plus`로 읽고 코드에 하드코딩하지 않습니다.
 9. **릴리스 워크플로 복사** — 데스크톱은 [`../desktop/`](../desktop/),

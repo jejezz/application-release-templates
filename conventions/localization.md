@@ -63,15 +63,17 @@ localeResolutionCallback: (device, supported) =>
 
 ### 4. 전환 UI
 
-- **데스크톱**: 앱 바의 언어 아이콘(`Icons.language_rounded`)을 누르면 체크 표시가 있는 팝업 메뉴가
-  열립니다 (allwinner 방식).
-  - 항목은 `시스템 설정 따르기 / System`, `한국어`, `English`입니다.
+🔴 **변경 (conventions-v2)** — 언어 전환도 테마와 마찬가지로 앱 바가 아니라
+**설정 화면**의 "외형" 섹션 안에서 합니다. 구조는
+[settings-screen.md](settings-screen.md)가 정합니다.
+
+- 항목은 `시스템 설정 따르기 / System`, `한국어`, `English`입니다.
   - 언어 이름은 **그 언어로** 씁니다. 잘못 선택해서 읽을 수 없는 언어가
     되어도 되돌아올 수 있게 하기 위해서입니다.
-  - 순환 버튼(daylight, dove)은 현재 상태와 다음 상태가 보이지 않으므로
-    쓰지 않습니다.
-- **모바일**: 설정 화면의 `SegmentedButton`을 씁니다 (saturn의 테마 선택
-  방식).
+  - 순환 버튼(daylight, dove)이나 앱 바 팝업 메뉴(allwinner)는 더 이상
+    쓰지 않습니다 — 설정 화면 "외형" 섹션의 모드 항목 바로 아래 둡니다.
+- 모바일은 지금처럼 `SegmentedButton`을 쓰되, 위치만 설정 화면의 "외형"
+  섹션 안입니다.
 - 바꾸면 앱을 다시 시작하지 않고 즉시 적용합니다.
 
 ### 5. 설정 저장 키 (언어·테마 공통)

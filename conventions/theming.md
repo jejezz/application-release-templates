@@ -72,18 +72,22 @@
 
 ### 3. 전환 UI
 
-[localization.md](localization.md)의 언어 전환과 **같은 방식**으로 만듭니다.
+🔴 **변경 (conventions-v2)** — 테마·언어 전환은 더 이상 앱 바 아이콘이
+아니라 **설정 화면** 안에서 합니다. 구조와 라벨은
+[settings-screen.md](settings-screen.md)가 정합니다. 요약:
 
+- 앱 바에는 테마/언어 아이콘 대신 **설정 아이콘** 하나(`⌘,`/`Ctrl+,`)만
+  둡니다. 버튼 순서는 `… | 설정 | 정보`입니다.
+- 설정 화면 "외형" 섹션 첫 항목이 모드 전환이고, 라벨은 **"모드"**입니다
+  (예전 "밝기"·"테마" 명칭은 쓰지 않습니다). 값은 `시스템 설정 따르기 /
+  라이트 / 다크`.
 - 기준 구현: [`common/lib/settings/`](../common/lib/settings/) —
-  `AppSettings`(저장·이전·언어 해석), `ThemeMenuButton`,
-  `LanguageMenuButton`, 모바일용 `*SegmentedButton`.
-- **데스크톱**: 앱 바 아이콘을 누르면 체크 표시가 있는 팝업 메뉴가 열리고,
-  항목은 `시스템 설정 따르기`, `라이트`, `다크`입니다.
-  - 아이콘은 현재 모드를 보여줍니다: `brightness_auto` / `light_mode` /
-    `dark_mode` (Material Symbols Rounded).
-- **모바일**: 설정 화면의 `SegmentedButton`을 씁니다 (saturn 방식).
+  `AppSettings`(저장·이전·언어 해석), 모바일용 `*SegmentedButton`. 데스크톱
+  전용 앱의 `AlertDialog`/모바일 포함 앱의 `Scaffold` 기준 구현은
+  [settings-screen.md](settings-screen.md) §1 참고.
 - 저장 키는 `theme_mode`이고, 값은 `ThemeMode.name`입니다.
-- 앱 바 오른쪽 끝의 버튼 순서는 `… | 테마 | 언어 | 정보`입니다.
+- 색 구성(새턴/청록/호박/장미/슬레이트/고대비) 팔레트는
+  [settings-screen.md](settings-screen.md) §4에서 다룹니다.
 
 ### 4. 창 테두리와 시스템 UI
 
