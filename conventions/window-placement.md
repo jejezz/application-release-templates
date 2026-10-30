@@ -34,6 +34,9 @@
   이 규칙으로 기억합니다. `WindowPlacement(isDocked: ...)`에 도킹 여부를 넘기면 도킹
   중에는 저장하지 않아, 다음 실행 때 도킹 전 크기로 돌아옵니다. 도킹으로 시작하는 경우
   `placeInitially()`는 부르지 않고 `attach()`만 합니다.
+- **2026-10-30: §5(창을 첫 프레임 뒤에 보이기)를 추가했습니다.** 그 전에 이 규칙을
+  적용한 앱은 `windows/runner/flutter_window.cpp`의 자동 `this->Show()`를 안
+  지웠을 가능성이 커 같은 깜빡임·크기 점프가 있을 수 있습니다. 확인·패치가 필요합니다.
 
 ## 규칙
 
@@ -55,43 +58,14 @@
 당겨 넣는다. 걸치는 모니터가 없으면(모니터를 뗀 경우 등) null — 그러면 주 모니터
 가운데에 연다.
 
-### 3. 시작 위치는 두 단계로 놓는다 (`WindowPlacement.placeInitially`)
+### 3. 시작 위치는 필요할 때만 두 단계로 놓는다 (`WindowPlacement.placeInitially`)
 
 목표 모니터의 배율이 창이 **지금** 있는 모니터(보통 주 모니터)와 다르면 한 번에
-정확히 놓을 수 없다. 1단계로 목표 모니터 안쪽(여유 40px)으로 `setPosition`한 뒤
-`getDevicePixelRatio()`가 목표 배율로 바뀔 때까지 기다리고(최대 12×50ms), 2단계로
-그 배율 기준 좌표로 `setBounds`해 정확한 위치·크기를 맞춘다.
-
-```dart
-WindowPlacement? placement;
-if (_isDesktop) {
-  await windowManager.ensureInitialized();
-  const defaultSize = Size(1200, 720);
-  if (WindowPlacement.enabled) {
-    placement = WindowPlacement(await SharedPreferences.getInstance(), defaultSize: defaultSize);
-  }
-  final options = WindowOptions(
-    size: defaultSize,
-    minimumSize: const Size(960, 600),
-    center: placement == null,
-    title: '<표시 이름>',
-  );
-  await windowManager.waitUntilReadyToShow(options, () async {
-    await placement?.placeInitially();
-    placement?.attach();
-    await windowManager.show();
-    await windowManager.focus();
-  });
-}
-```
-
-- Windows(`WindowPlacement.enabled`)에서만 쓴다. 그 밖(macOS, Linux)은
-  `WindowOptions(center: true)`를 그대로 쓴다 — `placement`가 null이면 `center`가
-  true가 되어 기존 동작과 같다.
-- `placement?.attach()`는 `show()` 전에 불러도 된다 — 리스너만 등록할 뿐 아직
-  저장은 하지 않는다. 앱을 끝낼 때 `placement?.detach()`를 부를 필요는 없다
-  (프로세스가 끝나면 같이 끝난다); 다만 창을 직접 닫지 않고 숨겨 재사용하는 상주
-  앱이라면 다시 보일 때 쓰고 있는 인스턴스를 그대로 쓴다.
+정확히 놓을 수 없다. 그럴 때만 1단계로 목표 모니터 안쪽(여유 40px)으로
+`setPosition`한 뒤 `getDevicePixelRatio()`가 목표 배율로 바뀔 때까지 기다리고(최대
+12×50ms), 2단계로 그 배율 기준 좌표로 `setBounds`해 정확한 위치·크기를 맞춘다.
+배율이 이미 같으면(단일 모니터 등, 흔한 경우) 1단계를 건너뛰고 바로 `setBounds`한다
+— 모니터를 안 옮기므로 불필요한 지연과 리페인트가 없다.
 
 ### 4. 위치·크기·최대화 상태를 묶어서 저장한다
 
@@ -101,6 +75,88 @@ if (_isDesktop) {
 복원했다가 최대화를 풀면 원래 크기로 돌아온다. 저장 키는 `window_placement`
 하나(JSON: `x`, `y`, `w`, `h`, `scale`, `max`)다 — 좌표만 저장하던 옛 키
 (`window_display` 등)와 겹치지 않는다.
+
+### 5. 창은 첫 프레임이 그려진 뒤에 보여야 깜빡이지 않는다
+
+**2026-10-30: daylight-commander-flutter에서 발견 — Flutter의 Windows 기본 템플릿은
+`windows/runner/flutter_window.cpp`에 "첫 프레임이 그려지면 네이티브 코드가 바로
+창을 보여주는" 코드(`SetNextFrameCallback([&]{ this->Show(); })`)를 기본으로
+넣는다. 이게 `WindowPlacement.placeInitially()`보다 먼저 끝나 버리면, 창이
+아직 최종 모니터·배율로 옮기기 전(기본 `origin (10, 10)`, 주 모니터 배율) 크기로
+먼저 보였다가 자리 잡으며 커졌다 줄었다 하는 게 비친다 — 듀얼 모니터뿐 아니라
+단일 모니터에서도 테마 안 입혀진 빈 화면이 잠깐 보였다 바뀌는 깜빡임으로
+나타난다.** 두 가지를 같이 해야 고쳐진다:
+
+1. **`windows/runner/flutter_window.cpp`에서 그 자동 `this->Show()`를 지운다**
+   (`flutter_controller_->ForceRedraw();` 호출은 그대로 둔다). `window_manager`
+   패키지 자체 문서(`SetNextFrameCallback` 섹션)에도 같은 안내가 있다 — 창 표시를
+   `window_manager` 쪽에서 전적으로 맡기기 위해서다.
+2. **Dart 쪽 `windowManager.show()`를 Flutter의 첫 프레임이 그려진 뒤로 미룬다.**
+   `waitUntilReadyToShow`의 콜백에서 배치만 끝내고(`show()`는 부르지 않는다),
+   `runApp()` 뒤에 등록한 `addPostFrameCallback`이 그 배치가 끝난 것까지 확인한 뒤
+   `show()`를 부른다. 배치가 끝난 직후에도 그 크기로 다시 그릴 프레임이 아직 안
+   나왔을 수 있어, 프레임을 한 번 더 기다린다.
+
+```dart
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  registerExtraLicenses();
+
+  Future<void> Function()? showWindow;
+  if (_isDesktop) {
+    await windowManager.ensureInitialized();
+    showWindow = await _prepareWindow();
+  }
+
+  final settings = await AppSettings.load();
+  final updates = await UpdateService.create();
+  runApp(UpdateScope(service: updates, child: App(settings: settings, updates: updates)));
+
+  if (showWindow != null) {
+    final show = showWindow;
+    WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(show()));
+  }
+}
+
+Future<void> _nextFrame() {
+  final completer = Completer<void>();
+  WidgetsBinding.instance.addPostFrameCallback((_) => completer.complete());
+  WidgetsBinding.instance.scheduleFrame();
+  return completer.future;
+}
+
+Future<Future<void> Function()> _prepareWindow() async {
+  const size = Size(1200, 720);
+  WindowPlacement? placement;
+  if (WindowPlacement.enabled) {
+    placement = WindowPlacement(await SharedPreferences.getInstance(), defaultSize: size);
+  }
+  final options = WindowOptions(
+    size: size,
+    minimumSize: const Size(960, 600),
+    center: placement == null,
+    title: '<표시 이름>',
+  );
+  final placed = Completer<void>();
+  windowManager.waitUntilReadyToShow(options, () async {
+    await placement?.placeInitially();
+    placed.complete();
+  });
+  return () async {
+    await placed.future;
+    await _nextFrame();
+    await windowManager.show();
+    await windowManager.focus();
+    placement?.attach();
+  };
+}
+```
+
+전체는 [`../common/lib/main.dart`](../common/lib/main.dart)에 있다. `placement?.attach()`는
+`show()` 뒤에 불러도 된다 — 리스너만 등록할 뿐 아직 저장은 하지 않는다. 앱을 끝낼
+때 `placement?.detach()`를 부를 필요는 없다(프로세스가 끝나면 같이 끝난다); 다만
+창을 직접 닫지 않고 숨겨 재사용하는 상주 앱이라면 다시 보일 때 쓰고 있는 인스턴스를
+그대로 쓴다.
 
 ## 알아둘 점
 
@@ -116,11 +172,15 @@ if (_isDesktop) {
 
 1. `common/lib/window/window_placement.dart`를 `lib/window/`에 복사합니다.
 2. `flutter pub add window_manager screen_retriever shared_preferences`
-3. `main()`의 `WindowOptions`에서 위 예시처럼 `WindowPlacement`를 만들고
-   `placeInitially`/`attach`를 연결합니다. `center: true`를 쓰던 자리는
-   `center: placement == null`로 바꿉니다.
-4. `common/test/window_placement_test.dart`를 `test/`에 복사하고 `<package>`를
+3. `main()`을 §5 예시(또는 `common/lib/main.dart`)처럼 구성합니다: `WindowPlacement`를
+   만들어 `placeInitially`를 연결하고(`center: true`를 쓰던 자리는
+   `center: placement == null`로 바꿉니다), `windowManager.show()`는 첫 프레임이
+   그려진 뒤로 미룹니다.
+4. **`windows/runner/flutter_window.cpp`에서 `SetNextFrameCallback`의
+   `this->Show();`를 지웁니다** — 안 지우면 3번이 무의미해집니다(§5).
+5. `common/test/window_placement_test.dart`를 `test/`에 복사하고 `<package>`를
    앱 이름으로 바꿉니다.
-5. 듀얼 모니터 환경(배율이 다른 조합)에서 보조 모니터로 옮기고 크기를 바꾼 뒤
+6. 듀얼 모니터 환경(배율이 다른 조합)에서 보조 모니터로 옮기고 크기를 바꾼 뒤
    종료하고 다시 실행해 그 크기·위치로 돌아오는지, 최대화한 채 끝내면 최대화로
-   열리는지 확인합니다.
+   열리는지, 시작할 때 창 안 내용이 커졌다 줄어들거나 빈 화면이 깜빡이지 않는지
+   확인합니다.

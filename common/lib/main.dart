@@ -5,9 +5,11 @@
 //   언어 해석 · macOS 앱 메뉴 About · 앱 바 [테마 | 언어 | 정보] · 빈 상태.
 // 기존 앱에는 통째로 덮어쓰지 말고 필요한 부분만 옮긴다.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'about/about_dialog.dart';
@@ -29,23 +31,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   registerExtraLicenses();
 
+  // 창을 실제로 보일 준비(위치·크기 계산)가 끝나면 호출할 함수. 첫 프레임이 그려지기 전에 부르면
+  // 테마가 입혀지지 않은 빈 화면이 잠깐 보였다가 바뀌는 깜빡임이 생기므로, 첫 프레임 뒤로 미룬다
+  // (window-placement.md §5 — windows/runner/flutter_window.cpp의 자동 show()도 지워야 한다).
+  Future<void> Function()? showWindow;
   if (_isDesktop) {
     await windowManager.ensureInitialized();
-    // ui-ux.md §5: 최소 크기는 960×600 이하 (1366×768 노트북).
-    // 위치는 center: true 대신 placeWindowAtStartup — window-placement.md.
-    const size = Size(1200, 720);
-    const options = WindowOptions(
-      size: size,
-      minimumSize: Size(960, 600),
-      center: false,
-      title: AppIdentity.displayName,
-    );
-    await windowManager.waitUntilReadyToShow(options, () async {
-      await placeWindowAtStartup(size);
-      await windowManager.show();
-      await windowManager.focus();
-      LastDisplaySaver().start();
-    });
+    showWindow = await _prepareWindow();
   }
 
   final settings = await AppSettings.load();
@@ -53,6 +45,51 @@ Future<void> main() async {
   final updates = await UpdateService.create();
   // UpdateScope 는 MaterialApp 위에 둔다 — 정보 창이 이것을 읽어 "업데이트 확인" 단추를 붙인다.
   runApp(UpdateScope(service: updates, child: App(settings: settings, updates: updates)));
+
+  if (showWindow != null) {
+    final show = showWindow;
+    WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(show()));
+  }
+}
+
+/// 다음 프레임이 그려질 때까지 기다린다. 지금 막 레이아웃이 바뀌어 다시 그려야 할 프레임이
+/// 예약돼 있지 않을 수도 있어, 프레임을 하나 더 예약해 둔다.
+Future<void> _nextFrame() {
+  final completer = Completer<void>();
+  WidgetsBinding.instance.addPostFrameCallback((_) => completer.complete());
+  WidgetsBinding.instance.scheduleFrame();
+  return completer.future;
+}
+
+/// 창 크기·위치를 계산해 둔다. 창을 실제로 보이려면 돌려준 함수를 불러야 한다(첫 프레임이 그려진
+/// 뒤에 부르는 것은 호출하는 쪽의 몫). ui-ux.md §5: 최소 크기는 960×600 이하(1366×768 노트북).
+/// 위치는 center: true 대신 WindowPlacement — window-placement.md.
+Future<Future<void> Function()> _prepareWindow() async {
+  const size = Size(1200, 720);
+  WindowPlacement? placement;
+  if (WindowPlacement.enabled) {
+    placement = WindowPlacement(await SharedPreferences.getInstance(), defaultSize: size);
+  }
+  final options = WindowOptions(
+    size: size,
+    minimumSize: const Size(960, 600),
+    center: placement == null,
+    title: AppIdentity.displayName,
+  );
+  final placed = Completer<void>();
+  windowManager.waitUntilReadyToShow(options, () async {
+    await placement?.placeInitially();
+    placed.complete();
+  });
+  return () async {
+    await placed.future;
+    // 배치가 끝난 직후에도 Flutter가 그 크기로 다시 그릴 프레임이 아직 안 나왔을 수 있어, 한
+    // 프레임 더 기다렸다가 보여준다 (창 안 내용이 잠깐 엉뚱한 크기로 보였다가 바뀌는 것을 막는다).
+    await _nextFrame();
+    await windowManager.show();
+    await windowManager.focus();
+    placement?.attach();
+  };
 }
 
 class App extends StatefulWidget {
