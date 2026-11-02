@@ -1,20 +1,19 @@
 # 설정 창
 
 데스크톱 앱의 **화면 관련 사용자 설정**(테마, 색 구성, 글자 크기, 언어)을 한곳에 모으는 방식입니다.
-기준 구현은 daylight-commander(`lib/settings/settings_dialog.dart`)이고, 창 모양은
-daylight-workbench의 설정 창을 따랐습니다.
+복사용 기준 구현은 [`common/lib/settings/settings_dialog.dart`](../common/lib/settings/settings_dialog.dart)이고,
+창 모양은 daylight-workbench의 설정 창을 따랐습니다.
 
-> **가능하면** 적용합니다. 설정할 것이 거의 없는 앱, 모바일 앱(설정 *화면*을 따로 둔 saturn 방식),
-> 앱 바 공간이 넉넉하고 팝업 메뉴가 더 나은 앱은 예외로 두고, 앱 `UI_UX.md`에 이유를 적습니다.
-> 이미 [theming.md](theming.md)·[localization.md](localization.md)·[fonts.md](fonts.md)의 앱 바
-> 팝업 메뉴를 쓰는 앱은 다음에 정비할 때 이 문서의 방식으로 **가능하면** 옮깁니다.
+> 데스크톱 앱은 테마·색 구성·언어를 이 창에서만 바꿉니다. 앱 바에는 테마/언어/글자 크기 팝업이나 순환 버튼을
+> 두지 않습니다. 모바일 앱은 이 창 대신 설정 *화면*([settings-screen.md](settings-screen.md))을 씁니다.
+> 설정할 것이 거의 없는 앱도 "외형" 구역(모드·색 구성·언어) 때문에 설정 창은 갖춥니다.
 
 ## 정의
 
 | 설정 | 무엇 | 값 | 저장 키 | 없을 때 |
 |---|---|---|---|---|
-| 테마 | 밝기 | `system` / `light` / `dark` (`ThemeMode.name`) | `theme_mode` | 시스템 |
-| 색 구성(color theme) | 주색 계열 | `saturn` / `teal` / `amber` / `rose` / `slate` / `highContrast` (`ColorPalette.name`) | `theme_palette` | `saturn` |
+| 모드 | 밝기 | `system` / `light` / `dark` (`ThemeMode.name`) | `theme_mode` | 시스템 |
+| 색 구성(color theme) | 주색 계열 | `saturn` / `teal` / `amber` / `rose` / `slate` / `highContrast` (`AccentPalette.name`) | `accent_palette` | `saturn` |
 | 글자 크기 | 전체 글자 배율 | 0.9 작게 / 1.0 보통 / 1.15 크게 | `text_scale` | 1.0 |
 | 언어 | UI 언어 | `ko` / `en` | `app_locale` | 시스템 |
 
@@ -30,7 +29,7 @@ daylight-workbench의 설정 창을 따랐습니다.
   - Icons8 설정 아이콘이 **없으면 Material 아이콘을 쓰기를 권장합니다**(`Icons.settings_outlined`,
     다른 앱 바 아이콘이 둥근 계열이면 `Icons.settings_rounded`). 앱 바의 다른 아이콘과 같은 계열·크기(24)로
     맞추고, 한 앱 안에서 Icons8와 Material을 섞어 쓰지 않도록 [icons.md](icons.md)를 따릅니다.
-- 이전의 `글자 크기 | 테마 | 언어` 팝업 버튼은 **가능하면** 없애고 설정 창으로 옮깁니다.
+- 앱 바에는 `글자 크기`·`테마`·`언어` 팝업 버튼이나 순환 버튼을 두지 않습니다. 모두 설정 창으로 들어갑니다.
   (macOS 메뉴 막대에 "설정…"(⌘,)이 있으면 같은 창을 엽니다 — [ui-ux.md](ui-ux.md).)
 
 ## 설정 창 구성
@@ -60,10 +59,10 @@ daylight-workbench의 설정 창을 따랐습니다.
 
 | 구역 | 내용 | 위젯 |
 |---|---|---|
-| 화면 | 테마 | `SegmentedButton<ThemeMode>` — 시스템·라이트·다크, 각각 아이콘 포함 |
+| 외형 | 모드 | `SegmentedButton<ThemeMode>` — 시스템·라이트·다크, 각각 아이콘 포함 |
 | | 색 구성 | `ChoiceChip`을 `Wrap`으로 — 색마다 주색 원(`primaryFor(brightness)`)을 앞에 보임. 고대비는 원 대신 대비 아이콘 |
 | | 글자 크기 | `SegmentedButton<double>` — 작게·보통·크게 |
-| 언어 | 언어 | `SegmentedButton<String>` — 시스템·한국어·English (언어 이름은 그 언어로) |
+| | 언어 | `SegmentedButton<String>` — 시스템·한국어·English (언어 이름은 그 언어로) |
 
 - 구역이 늘면 목록(넓은 배치는 왼쪽, 좁은 배치는 위쪽 칩)에 추가합니다 (workbench는 편집기·터미널 등 앱 고유 구역을 더 둠).
   앱 고유 설정은 [localization.md](localization.md) §5의 `<기능>_<이름>` 키를 씁니다.
@@ -91,7 +90,7 @@ daylight-workbench의 설정 창을 따랐습니다.
   ```
   글자 크기는 `MediaQuery.textScaler`에 적용합니다 ([fonts.md](fonts.md) §6).
 
-### 색 구성 (`ColorPalette`)
+### 색 구성 (`AccentPalette`)
 
 | 이름 | 다크 주색 | 라이트 주색 |
 |---|---|---|
@@ -140,6 +139,6 @@ daylight-workbench의 설정 창을 따랐습니다.
   없고, 위쪽 칩으로 구역이 바뀌는지 확인합니다.
 - 설정 창을 `Scaffold(body: SettingsDialog())`로 띄워 각 선택지를 눌러 값이 바뀌고(`AppSettings`,
   `fontScaleProvider`) `shared_preferences`에 저장되는지 확인합니다.
-- 저장된 `theme_palette`를 읽는지, `AppTheme.light/dark(palette)`의 `primary`가 해당 색인지,
+- 저장된 `accent_palette`를 읽는지, `AppTheme.light/dark(palette)`의 `primary`가 해당 색인지,
   고대비의 `surface`가 순흑/순백인지 확인합니다.
 - 기존 키(`theme_mode`, `app_locale`)를 그대로 읽는지 확인합니다.

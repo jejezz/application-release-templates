@@ -7,7 +7,7 @@
 |---|---|---|
 | [`lib/main.dart`](lib/main.dart) | 새 앱: `lib/main.dart` / 기존 앱: 참고만 | 아래 모든 것의 연결 예시 (창, 라이선스, 설정, 테마, 언어, macOS 메뉴, 앱 바, 빈 상태) |
 | [`lib/theme/app_theme.dart`](lib/theme/app_theme.dart) | `lib/theme/app_theme.dart` | [ui-ux.md](../conventions/ui-ux.md), [theming.md](../conventions/theming.md), [fonts.md](../conventions/fonts.md) |
-| [`lib/settings/`](lib/settings/) | `lib/settings/` | 테마·언어 저장과 전환 메뉴 — [theming.md](../conventions/theming.md) §3, [localization.md](../conventions/localization.md) §3–5 |
+| [`lib/settings/`](lib/settings/) | `lib/settings/` | 테마·색 구성·언어 저장과 설정 창("외형" 구역) — [settings-screen.md](../conventions/settings-screen.md), [theming.md](../conventions/theming.md) §3, [localization.md](../conventions/localization.md) §3–5 |
 | [`lib/window/focus_tint.dart`](lib/window/focus_tint.dart) | `lib/window/focus_tint.dart` | 창 포커스에 따라 앱 바가 물드는 효과 — [ui-ux.md](../conventions/ui-ux.md) §4 |
 | [`lib/window/window_placement.dart`](lib/window/window_placement.dart) | `lib/window/window_placement.dart` | 시작할 때 창 위치(듀얼 모니터·배율이 다른 Windows) — [window-placement.md](../conventions/window-placement.md) |
 | [`lib/about/app_menu_bar.dart`](lib/about/app_menu_bar.dart) | `lib/about/app_menu_bar.dart` | macOS 앱 메뉴 About — [about-dialog.md](../conventions/about-dialog.md) §1 |

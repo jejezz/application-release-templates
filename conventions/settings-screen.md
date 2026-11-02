@@ -41,7 +41,7 @@ news_feeder, stevedore)는 설정 화면 자체가 없습니다.
 
 | 지원 플랫폼 | 구조 | 기준 구현 |
 |---|---|---|
-| **데스크톱 전용** (macOS/Windows/Linux만) | `AlertDialog` + 좌측 섹션 리스트. 앱바 설정 아이콘이나 `⌘,`/`Ctrl+,`로 연다 | `daylight-flutter-studio/lib/ui/settings_dialog.dart`의 `enum SettingsSection` 패턴 |
+| **데스크톱 전용** (macOS/Windows/Linux만) | `AlertDialog` + 좌측 섹션 리스트. 앱바 설정 아이콘이나 `⌘,`/`Ctrl+,`로 연다 | [`common/lib/settings/settings_dialog.dart`](../common/lib/settings/settings_dialog.dart) |
 | **모바일 포함** (android/ios 폴더가 하나라도 있음) | `Scaffold` 전체 페이지(별도 라우트) | `kamailio-sip-client/lib/ui/settings_screen.dart` |
 
 데스크톱 전용 앱에 모바일 전용 위젯(`SegmentedButton` 풀폭 등)을 쓰지
@@ -54,8 +54,7 @@ news_feeder, stevedore)는 설정 화면 자체가 없습니다.
   설정 화면 안 "외형" 섹션으로 들어갑니다(§3).
 - 대신 설정 아이콘(`Icons.settings_rounded`, 단축키 `⌘,`/`Ctrl+,`) 하나를
   둡니다. 앱바 오른쪽 끝 버튼 순서는 `… | 설정 | 정보`로 바뀝니다
-  (`theming.md` §3, `conventions/README.md` 체크리스트 7번의
-  `테마 | 언어 | 정보`를 대체).
+  (`theming.md` §3).
 - 설정 화면이 없는 11개 앱도 설정 아이콘을 추가할 때 이 문서의 구조를
   바로 따릅니다 — 과거의 "앱바 테마/언어 아이콘만" 상태로 새로 만들지
   않습니다.
@@ -93,30 +92,24 @@ news_feeder, stevedore)는 설정 화면 자체가 없습니다.
 | 슬레이트 | `#94A3B8` | `#475569` |
 | 고대비 | `#FFD60A` | `#0000CC` |
 
-기준 구현: `daylight-flutter-studio/lib/theme/app_theme.dart`의
-`enum StudioPalette`. 이 파일을 `common/lib/theme/app_theme.dart`로
-역이식하는 것이 다음 작업입니다(§6).
+기준 구현: [`common/lib/theme/app_theme.dart`](../common/lib/theme/app_theme.dart)의
+`enum AccentPalette`.
 
 저장 키는 `accent_palette`(값은 enum name)로 통일합니다. 앱 고유 의미
 색(파일 종류 색 등)은 팔레트 전환과 무관하게 유지합니다.
 
 ### 5. 모바일 — 지금까지의 `SegmentedButton`
 
-`theming.md`/`localization.md`가 정한 모바일용 `ThemeSegmentedButton`·
-`LanguageSegmentedButton`은 그대로 쓰되, **설정 화면의 "외형" 섹션
+`common/lib/settings/settings_menus.dart`의 `ModeSegmentedButton`·`AccentPaletteChips`·
+`LanguageSegmentedButton`을 그대로 쓰되, **설정 화면의 "외형" 섹션
 맨 위**에 배치합니다(saturn-mobile 방식이 아니라 kamailio 방식). 모바일도
 색 구성(§4)을 같은 섹션에 추가합니다.
 
 ### 6. 남은 작업 (🟡 TODO)
 
-- `common/lib/settings/`에 이 구조의 공통 다이얼로그/페이지 뼈대를
-  추가합니다 (`SettingsSection` 추상화, 섹션 리스트 위젯). 지금은 각 앱이
-  `settings_dialog.dart`를 처음부터 다시 구현합니다.
-- `StudioPalette`를 `common/lib/theme/app_theme.dart`로 옮기고 이름을
-  `AccentPalette`로 정리합니다(studio 전용 이름을 공통 이름으로).
-- `ui-ux.md` §7 단축키 표와 `conventions/README.md` 체크리스트 7번의
-  `테마 | 언어 | 정보`를 `설정 | 정보`로 고칩니다(별도 커밋에서 §2 반영 시
-  같이 수정).
+- 데스크톱 `AlertDialog` 뼈대는 [`common/lib/settings/settings_dialog.dart`](../common/lib/settings/settings_dialog.dart)에
+  있습니다(`SettingsSection`에 앱 고유 구역을 더합니다). 모바일 포함 앱의 `Scaffold` 전체 페이지
+  뼈대는 아직 없어서, 기준 구현(`kamailio-sip-client/lib/ui/settings_screen.dart`)을 보고 만듭니다.
 
 ## 관련 문서
 

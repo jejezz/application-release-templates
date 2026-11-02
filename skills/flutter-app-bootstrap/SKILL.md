@@ -87,10 +87,10 @@ Then the names and copyright (`identity.md` §2, §4):
 Follow `$T/common/README.md` "적용 순서" top to bottom. For a new app copy all
 of `common/lib/` **including `main.dart`** — it already wires everything the
 conventions ask for: window size (`window_manager`), extra licenses, saved
-theme/language (`AppSettings`, keys `theme_mode`/`app_locale`), light/dark
+theme/color scheme/language (`AppSettings`, keys `theme_mode`/`accent_palette`/`app_locale`), light/dark
 Saturn theme, `localeResolutionCallback`, the macOS app-menu About,
-`windowManager.setBrightness`, and the app bar `theme | language | About` over
-an empty-state home screen. Don't reinvent any of these; adjust only:
+`windowManager.setBrightness`, and the app bar `settings | About` (the settings dialog's "Appearance" section
+holds mode, color scheme and language) over an empty-state home screen. Don't reinvent any of these; adjust only:
 
 - `lib/app_identity.dart`: display name, repository URL, `firstReleaseYear`.
 - ARB: replace the `(앱별)` / `(per app)` values with this app's tagline,
@@ -101,10 +101,10 @@ an empty-state home screen. Don't reinvent any of these; adjust only:
 - App bar height comes from `AppBarTheme.toolbarHeight` in the copied
   `app_theme.dart` (44 desktop / 56 mobile); never pass `toolbarHeight` to an
   individual `AppBar`.
-- App bar icons: when you add buttons next to `theme | language | About`, give
+- App bar icons: when you add buttons next to `settings | About`, give
   them all the same size (20 by default, `ui-ux.md` §4). Set it once with an
   `IconButtonTheme` `iconSize` rather than per button, so no button is left at
-  the default 24. The language button uses `Icons.language_rounded`.
+  the default 24. The settings button uses `Icons.settings_rounded`.
 
 Assets:
 - **Icon**: glyph at `assets/icon/source_glyph.png`, then

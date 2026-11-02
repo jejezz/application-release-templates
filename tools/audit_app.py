@@ -537,11 +537,16 @@ class Audit:
             self.add('theme.prefs-key', a, 'pass', "theme saved as 'theme_mode'")
         elif 'ThemeMode.' in lib:
             self.add('theme.prefs-key', a, 'warn', "theme not saved under 'theme_mode'", "prefs key 'theme_mode'", doc)
-        if re.search(r'_cycleOrder|\.cycle\(\)', lib):
-            self.add('theme.switcher', a, 'warn', 'theme/language switch is a cycle button',
-                     'checked popup menu (common/lib/settings/settings_menus.dart)', doc)
-        elif 'ThemeMenuButton' in lib or 'CheckedPopupMenuItem' in lib or 'SegmentedButton<ThemeMode>' in lib:
-            self.add('theme.switcher', a, 'pass', 'theme switcher is a menu / segmented control')
+        # settings-screen.md §2: theme/language live in the settings dialog's "Appearance" section.
+        if re.search(r'_cycleOrder|\.cycle\(\)|ThemeMenuButton|LanguageMenuButton|PopupMenuButton<ThemeMode>|ThemeSegmentedButton', lib):
+            self.add('theme.switcher', a, 'warn', 'theme/language switch is in the app bar (cycle button or popup menu)',
+                     'move it to the settings dialog "Appearance" section (common/lib/settings/settings_dialog.dart)',
+                     'settings-screen.md')
+        elif re.search(r'SettingsDialog|SettingsScreen|showSettingsDialog', lib):
+            self.add('theme.switcher', a, 'pass', 'theme/language are switched from the settings dialog')
+        else:
+            self.add('theme.switcher', a, 'warn', 'no settings dialog/screen for mode, color scheme and language',
+                     'add the settings dialog (common/lib/settings/settings_dialog.dart)', 'settings-screen.md')
         if 'ColorScheme.fromSeed' in lib:
             self.add('theme.palette', a, 'warn', 'ColorScheme.fromSeed used', 'Saturn palette ColorScheme', doc)
         if self.desktop and 'setBrightness' not in lib:
@@ -566,9 +571,6 @@ class Audit:
         if re.search(r'AppBar\([^;]*?toolbarHeight\s*:', lib, re.S):
             self.add('ui.appbar-height', a, 'warn', 'AppBar(toolbarHeight: …) set per screen',
                      'set AppBarTheme.toolbarHeight once in app_theme.dart (44 desktop / 56 mobile)', doc)
-        if 'Icons.translate_rounded' in lib:
-            self.add('ui.language-icon', a, 'warn', 'language menu uses the heavy Icons.translate_rounded',
-                     'Icons.language_rounded (looks smaller than the other app bar icons)', doc)
 
     def readme(self) -> None:
         a, doc = 'readme', 'readme-guide.md'

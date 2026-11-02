@@ -77,8 +77,7 @@ dependencies:
 앱 바 오른쪽 아이콘 버튼은 모두 같은 크기로 맞춥니다. 핵심은 "통일"이고 20은
 기본값입니다. 앱 바가 낮은 앱(예: 높이 44에 18)은 그 앱의 기존 크기로 통일해도 됩니다. 크기를 지정하지
 않은 버튼과 지정한 버튼이 섞이면 아이콘이 들쭉날쭉해 보입니다. 버튼 크기는
-`IconButtonTheme`의 `iconSize`로 한꺼번에 정하고, `translate`처럼
-꽉 찬 글리프는 더 커 보이므로 `language` 같은 윤곽선 아이콘을 씁니다.
+`IconButtonTheme`의 `iconSize`로 한꺼번에 정합니다.
 
 앱 바 높이는 `AppBarTheme.toolbarHeight`(공용 `app_theme.dart`)에서 한 번만
 정합니다. 화면마다 `AppBar(toolbarHeight: …)`를 따로 주지 않습니다 — 앱마다,
