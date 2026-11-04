@@ -4,6 +4,11 @@
 > [`conventions/`](conventions/)에 있습니다. 새 앱은 기능 구현 전에
 > [새 앱 시작 체크리스트](conventions/README.md#새-앱-시작-체크리스트)부터 끝내십시오.
 
+> **적용 범위: Flutter 앱 전용.** `conventions/`, `common/`, `desktop/`, `mobile/`,
+> `updater/`, `skills/`의 구현(Dart 코드, Flutter 빌드, `pubspec.yaml`)은 모두
+> Flutter 앱 기준입니다. Kotlin + Compose Multiplatform Desktop 앱은 별도로
+> [`compose/`](compose/)에서 관리합니다.
+
 여러 Flutter 앱에 그대로 옮겨 쓸 수 있게 일반화한 GitHub Actions 릴리스
 워크플로 템플릿 모음입니다. 배포 방식이 근본적으로 다른 두 그룹으로
 나뉩니다.

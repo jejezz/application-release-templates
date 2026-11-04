@@ -7,6 +7,10 @@
 구현한 복사용 템플릿입니다. 규약을 바꿀 때는 템플릿도 같은 커밋에서
 바꿉니다.
 
+> **이 폴더는 Flutter 앱용입니다.** 문서 안의 `pubspec.yaml`, `package_info_plus`,
+> `flutter create`, Dart 코드 등은 Flutter 기준입니다. Compose(Kotlin) 앱은
+> [`../compose/conventions/`](../compose/conventions/)를 따릅니다.
+
 > **상태: 초안 (2026-09-24)** — 로컬 앱 6개(allwinner-phoenix,
 > daylight-commander, dove-zip, garbage-cleaner(MacBroom), portside,
 > saturn-mobile-client)의 실제 설정을 비교해서 만들었습니다. 비교 결과는
