@@ -12,6 +12,15 @@
 2. 확인된 규칙만 이 폴더에 문서로 올립니다. 구현이 필요한 파일은 `../common/`, `../desktop/`에 둡니다.
 3. 앱의 `CLAUDE.md`에 적용한 Compose 규약 버전과 미적용 영역을 적습니다.
 
+## Flutter 규약과 다른 점 (요약)
+
+| 항목 | Flutter | Compose |
+|---|---|---|
+| 데스크톱 시작 버전 | `0.1.0-rc.1+1` | **`1.0.0-rc.1+1`** — jpackage가 macOS에서 `0.y.z`를 거부함 ([versioning.md](versioning.md) §2) |
+| 버전·정체성 원본 | `pubspec.yaml` + `AppInfo.xcconfig` | `gradle.properties`의 `app.*` 하나 |
+| 번들 ID | `flutter create`가 만들고 플랫폼별로 맞춤 | `macOS { bundleID }`를 **반드시 명시** (생략하면 코드 패키지에서 생성) |
+| Flutter 판과 병행하는 포팅 앱 | — | 번들 ID에 `.compose` 접미사 ([identity.md](identity.md) §3) |
+
 ## 대응표
 
 초기 판단: **공유** = 규칙은 Flutter 문서를 그대로 따름, **번역** = 규칙은 같고 구현이 다름,
@@ -19,9 +28,9 @@
 
 | Flutter 문서 | 초기 판단 | Compose에서 달라지는 점 | 상태 |
 |---|---|---|---|
-| identity | 공유 | 값(이름·ID·게시자)은 동일. 패키지명·`mainClass` 표기만 추가 | 미정 |
+| [identity](identity.md) | 번역 | 게시 주체 값은 동일. 원본이 `gradle.properties`, 번들 ID 명시 필수(`.compose` 접미사), 저작권은 `(C)` | **작성됨** |
 | tagging | 공유 | 태그 형식·절차 동일 | 미정 |
-| licensing | 공유 | 서드파티 고지 수집 방식이 `pubspec`에서 Gradle 의존성으로 바뀜 | 미정 |
+| [licensing](licensing.md) | 공유 | 앱 라이선스·에셋 조건은 동일. 서드파티 수집과 번들 JDK 고지는 정보 창 단계에서 정함 | **일부 작성됨** |
 | ui-ux | 공유 | 디자인 값은 동일, 토큰을 Compose 테마로 표현 | 미정 |
 | fonts | 공유 | 폰트 파일 재사용, 번들·로딩 방식이 Compose 리소스로 바뀜 | 미정 |
 | localization | 번역 | gen-l10n(ARB) 대신 Compose 문자열 리소스. 정책(ko 기준 + en, 저장 키)은 유지 | 미정 |
@@ -30,7 +39,7 @@
 | window-placement | 번역 | 문제(다중 모니터·배율)는 같고 `window_manager` 대신 `WindowState`/AWT | 미정 |
 | icons | 번역 | 생성 파이프라인 재사용 가능성 높음. macOS `.icns`·Windows `.ico` 연결 확인 필요 | 미정 |
 | readme-guide | 공유 | 구성·스크린샷 규격 동일 | 미정 |
-| versioning | 신규 | 원본이 `pubspec.yaml`이 아니라 Gradle. jpackage의 패키지 버전 제약(macOS는 MAJOR ≥ 1, 접미사 불가로 알려짐)과 앱 버전의 매핑 규칙 필요 — **`packageDmg`로 확인** | 미정 |
+| [versioning](versioning.md) | 신규 | 원본이 `gradle.properties`. **시작 버전 `1.0.0-rc.1`** (jpackage가 macOS에서 `0.y.z` 거부), 패키지 버전은 접미사를 뗌 | **작성됨** |
 | workflow | 신규 | Flutter 설정 대신 `setup-java`(17) + Gradle. 트리거·잡 구조는 참고 | 미정 |
 | packaging | 신규 | 파일명 규칙은 유지. macOS universal 불가로 arm64/x64 별도 빌드, 서명·공증은 Compose Gradle 플러그인 | 미정 |
 

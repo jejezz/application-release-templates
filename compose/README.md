@@ -9,8 +9,8 @@ Kotlin + Compose Multiplatform Desktop(JVM) 앱을 위한 규약과 템플릿입
 
 | 폴더 | 내용 | 상태 |
 |---|---|---|
-| [`conventions/`](conventions/) | Compose 앱 규약 문서와 Flutter 규약 대응표 | 대응표만 있음 |
-| `common/` | 복사용 Kotlin 공통 파일 (정보 창, 설정, 테마 등) | 아직 없음 |
+| [`conventions/`](conventions/) | Compose 앱 규약 문서와 Flutter 규약 대응표 | identity, versioning 작성됨, licensing 일부, 나머지는 대응표만 |
+| [`common/`](common/) | 복사용 Kotlin 공통 파일 (정보 창, 설정, 테마 등) | 정체성·버전·`bump-version.sh`만 있음 |
 | `desktop/` | GitHub Actions 릴리스 워크플로, 설치 프로그램 | 아직 없음 |
 
 ## 첫 앱
