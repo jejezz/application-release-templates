@@ -59,12 +59,13 @@
        - assets/icon/app_icon.png
        - assets/licenses/
    ```
-5. **아이콘** — Icons8 Sticker 글리프 SVG를
-   `assets/icon/source_glyph.svg`에 두고 (PNG면 투명 배경 1024px를
-   `source_glyph.png`로):
+5. **아이콘** — 앱 소품 글리프(Icons8)를 `assets/icon/source_glyph.svg`에 두고
+   (PNG면 투명 배경 1024px를 `source_glyph.png`로), `assets/icon/cat.json`에
+   앱 ID를 적고, 고양이 이미지 경로를 넘겨 실행합니다. 소품이 큰 그림,
+   고양이가 오른쪽 아래 배지입니다 ([icons.md](../conventions/icons.md)):
    ```bash
    pip3 install pillow
-   python3 tool/icon/generate_icons.py
+   python3 tool/icon/generate_icons.py <고양이 이미지 경로>
    ```
 6. **라이선스 원문** — `assets/licenses/seoul-namsan.txt` 등을 넣고
    `main()`에서 `runApp` 전에 `registerExtraLicenses()`를 부릅니다.

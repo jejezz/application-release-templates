@@ -62,8 +62,10 @@
 3. **LICENSE 추가** — [licensing.md](licensing.md)의 템플릿 그대로.
 4. **공통 파일 복사** — [`../common/`](../common/) README의 순서대로
    복사합니다. `lib/app_identity.dart`의 자리 표시자를 채웁니다.
-5. **아이콘** — 글리프 SVG를 `assets/icon/source_glyph.svg`에 두고
-   `python3 tool/icon/generate_icons.py`를 실행합니다 ([icons.md](icons.md)).
+5. **아이콘** — 앱 소품 글리프를 `assets/icon/source_glyph.svg`에 두고
+   `assets/icon/cat.json`을 만든 뒤
+   `python3 tool/icon/generate_icons.py <고양이 이미지 경로>`를 실행합니다.
+   소품이 큰 그림, 고양이가 배지입니다 ([icons.md](icons.md)).
 6. **버전** — 데스크톱 `0.1.0-rc.1+1`, 모바일 `0.1.0+1`로 시작
    ([versioning.md](versioning.md)). 이후에는 `scripts/bump-version.sh`로 올립니다.
 7. **앱 골격** — 첫 화면을 만들기 전에 아래를 먼저 깝니다.

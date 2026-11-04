@@ -107,8 +107,9 @@ holds mode, color scheme and language) over an empty-state home screen. Don't re
   the default 24. The settings button uses `Icons.settings_rounded`.
 
 Assets:
-- **Icon**: glyph at `assets/icon/source_glyph.png`, then
-  `python3 tool/icon/generate_icons.py`.
+- **Icon**: app prop glyph at `assets/icon/source_glyph.png`, `assets/icon/cat.json`
+  (app id), then `python3 tool/icon/generate_icons.py <cat image>`. The prop is the
+  main figure, the cat a small badge (conventions/icons.md).
 - **Fonts**: copy SeoulNamsan 400/700/800 TTFs from another app
   (`~/FlutterProject/*/assets/fonts/seoul_namsan_{regular,bold,extra_bold}.ttf`)
   and declare them as in `fonts.md` §1.

@@ -4,14 +4,31 @@
 
 ## 현재 상태
 
-- 앱 아이콘은 **앱 소품(큰 그림) + 고양이 배지**입니다. 앱 소품이 아이콘의 주인공이고
+- 앱 아이콘은 **앱 소품(큰 그림) + 고양이 배지**입니다. 소품이 정중앙의 주인공이고
   모든 앱이 같은 고양이를 오른쪽 아래 작은 배지로 씁니다. 판 색과 소품으로 앱을
-  구분합니다. 예전에는 고양이가 크고 소품이 배지였는데, 고양이만 크게 보여 앱이
-  구분되지 않아 역할을 맞바꿨습니다. 이미 옮긴 앱은 스크립트를 다시 돌려 아이콘을
-  새로 만들어야 합니다. 13개 앱(portside, daylight-terminal,
-  branch-dock, daylight-commander, dove-zip, flutty-dock, kamailio-sip-client,
-  macbroom, notes2hub, rs485-pc-emulator, stevedore, webservice-central,
-  allwinner-phoenix)이 PR로 옮겨 가는 중입니다.
+  구분합니다.
+- 새 방식으로 아이콘을 다시 생성해 병합한 앱(2026-11-04): daylight-terminal,
+  daylight-commander, dove-zip, notes2hub, rs485-pc-emulator, allwinner-phoenix,
+  branch-dock(daylight-taskbench), android-analyzer, bank-service-killer,
+  cuckoo-clock, daylight-pdf, snapdock.
+- 아직 옛 방식(큰 고양이 + 소품 배지)인 앱: portside, flutty-dock,
+  kamailio-sip-client, macbroom, stevedore, webservice-central. 앱의
+  `tool/icon/generate_icons.py`를 이 저장소의 새 버전으로 교체하고 다시 실행하면
+  바뀝니다.
+
+## 변경 이력
+
+| 날짜 | 변경 | 이유 |
+|---|---|---|
+| 2026-11-04 | 소품(캔버스의 76%, 정중앙)이 큰 그림, 고양이(42%, 오른쪽 아래)가 배지. 이전에는 고양이가 68%로 크고 소품이 42% 배지 | 고양이만 크게 보여 앱이 구분되지 않았습니다. 처음에는 소품을 왼쪽 위(68%)에 두었는데 한쪽으로 쏠려 보여 정중앙으로 옮기고 키웠습니다 |
+
+- 같은 종류의 소품을 쓰는 앱(문서 아이콘 등)은 판 색만으로는 구분이 약합니다.
+  소품 글리프에 글자나 색 띠를 합성할 수 있습니다(daylight-pdf: 빨간 "PDF" 띠,
+  앱에 있는 글꼴 사용). 합성하면 `source_glyph.png`는 Icons8 원본이 아니라 그
+  결과이므로 합성 방법을 커밋 메시지에 남깁니다.
+- 폴더처럼 앱이 이미 가진 Icons8 SVG를 소품으로 쓸 수 있습니다(daylight-commander).
+  macOS 렌더러(`render_svg.swift`)가 없으면 PNG를 직접 그려 만듭니다.
+
 - 소품 글리프가 없는 앱(janus-webrtc-client, tiki-taka, saturn-mobile-client,
   flutter_baresip, flutter_drag_out)은 아직 옮기지 않았습니다.
 - 원본 이미지는 전부 Icons8입니다(고양이, 소품 글리프). Icons8은 유료 플랜으로 쓰고
