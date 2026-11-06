@@ -177,6 +177,33 @@ python3 tool/icon/generate_icons.py <고양이 이미지 경로>   # assets/icon
 
 ## 앱 안 UI 아이콘 테마
 
+### 권고: 가능하면 Phosphor Duotone
+
+**모든 개발 환경(Flutter, Compose)에서 앱 안 UI 아이콘은 가능하면
+[Phosphor Icons](https://phosphoricons.com)의 Duotone 세트로 표현합니다.** 필수가
+아니라 권고입니다. Phosphor에 알맞은 아이콘이 없으면 아래 A·B로 대신합니다.
+
+- **한 앱은 Duotone 하나로 통일합니다.** thin·light·regular·bold·fill을 섞지
+  않습니다. 선택 상태처럼 강조가 필요하면 아이콘을 바꾸지 말고 색으로 표시합니다.
+- Duotone은 한 색(`currentColor`)에 옅은 보조 면을 겹치는 방식이라 **테마 색을
+  따릅니다.** 다크 모드용 변형 파일이 필요 없습니다 ([theming.md](theming.md) §5).
+- **쓰는 곳**: 툴바·버튼·메뉴·빈 화면·설정 항목 등 UI 아이콘 전부. **쓰지 않는
+  곳**: 앱 아이콘(런처·Dock·설치 프로그램)과 트레이 아이콘. 이들은 위
+  "앱 아이콘"·"트레이 / 메뉴바 아이콘" 규칙을 따릅니다.
+- **대신 쓰는 경우**: Phosphor에 없는 대상(파일 형식, 특정 기기, 브랜드)은 아래
+  A(Icons8)로, 그 밖의 조작 아이콘이 없으면 B(Material Symbols Rounded)로 대신합니다.
+  한 화면에서 둘 이상을 섞는 것은 피합니다.
+- **기존 앱을 일괄로 바꾸지 않습니다.** 화면을 고칠 때 그 화면의 아이콘부터
+  옮깁니다.
+- 라이선스는 MIT입니다 ([licensing.md](licensing.md)).
+
+| 환경 | 쓰는 방법 |
+|---|---|
+| Flutter | `phosphor_flutter` 패키지의 Duotone 클래스(`PhosphorIcon(PhosphorIconsDuotone.…)`). 앱의 공통 위젯 한 곳에서 감싸 크기·색을 맞춥니다 |
+| Compose | Phosphor 공식 SVG(`duotone` 폴더)를 벡터 리소스로 변환해 씁니다. 색은 `LocalContentColor`를 따르게 해 테마 색이 적용됩니다. 변환 방법은 Compose 규약([icons.md](../compose/conventions/icons.md))을 따릅니다 |
+
+### 기존 선택지 (A·B)
+
 두 가지가 섞여 있어서, 역할에 따라 나눠 씁니다.
 
 | 선택지 | 쓰는 앱 | 장점 | 단점 |
