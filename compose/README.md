@@ -4,7 +4,9 @@ Kotlin + Compose Multiplatform Desktop(JVM) 앱을 위한 규약과 템플릿입
 ([`../conventions/`](../conventions/), [`../common/`](../common/), [`../desktop/`](../desktop/))과
 분리해서 관리합니다.
 
-> **상태: 준비 중.** 첫 앱인 `daylight-commander-compose`를 단계별로 만들면서, 실제로 동작을
+> **상태: 보류.** 당분간 Compose로 개발하지 않습니다([프레임워크 선택 기준](../FRAMEWORKS.md)). 아래는 중단 시점의 기록입니다.
+>
+> **(보류 전) 준비 중.** 첫 앱인 `daylight-commander-compose`를 단계별로 만들면서, 실제로 동작을
 > 확인한 것만 규약으로 올립니다. Flutter 쪽이 portside로 검증한 뒤 일반화한 것과 같은 방식입니다.
 
 | 폴더 | 내용 | 상태 |

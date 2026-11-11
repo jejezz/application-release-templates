@@ -4,6 +4,9 @@
 > [`conventions/`](conventions/)에 있습니다. 새 앱은 기능 구현 전에
 > [새 앱 시작 체크리스트](conventions/README.md#새-앱-시작-체크리스트)부터 끝내십시오.
 
+> **어떤 프레임워크로 만들지**는 [`FRAMEWORKS.md`](FRAMEWORKS.md)를 먼저 보십시오.
+> (데스크톱 전용 → Avalonia, 데스크톱+스마트폰 또는 스마트폰 전용 → Flutter, 예외 있음)
+
 > **적용 범위: Flutter 앱 전용.** `conventions/`, `common/`, `desktop/`, `mobile/`,
 > `updater/`, `skills/`의 구현(Dart 코드, Flutter 빌드, `pubspec.yaml`)은 모두
 > Flutter 앱 기준입니다. Kotlin + Compose Multiplatform Desktop 앱은 별도로
