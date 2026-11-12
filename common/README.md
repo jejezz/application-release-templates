@@ -98,7 +98,7 @@
        git:
          url: https://github.com/jejezz/application-release-templates
          path: updater
-         ref: updater-v0.1.0   # 업데이트 코드가 들어 있는 태그. conventions-v1 은 그보다 앞선 커밋이라 쓰지 않는다
+         ref: updater-v0.2.0   # 업데이트 코드가 들어 있는 태그. conventions-v1 은 그보다 앞선 커밋이라 쓰지 않는다
    ```
    `updater/` 를 바꿀 때마다 새 태그(`updater-v0.1.1` …)를 달고, 앱은 그 태그로 올립니다 (git 의존성은 `ref` 를 고정해야 빌드가 재현됩니다).
 2. `lib/update/` 와 `app_identity.dart` 의 `updateServerUrl` · `updateAppId` 를 복사하고, `common_*.arb` 의 `update*` 키를 앱 ARB 에 합칩니다.
@@ -116,6 +116,9 @@
   - 정확한 버전은 릴리스 워크플로가 태그에서 `--dart-define=APP_VERSION=<버전>` 으로 넣는다 (`desktop/.github/workflows/release.yml`). 없으면 `x.y.z.n` 을 `x.y.z-rc.n` 으로 본다 (규약의 프리릴리스는 rc 뿐). 로컬 `flutter run` 은 define 없이도 이 대체 규칙으로 돈다.
   - 이미 쓰는 앱은 `lib/update/update_service.dart` 와 `release.yml` 의 `flutter build … --dart-define=APP_VERSION=${{ env.VERSION }}` 를 새 템플릿대로 맞춘다. `updater/` 는 바뀌지 않았으므로 `updater-v0.1.0` 태그는 그대로다.
 - 시작 시 확인은 첫 화면이 뜬 뒤 5초 뒤에 하고, 실패하면 아무것도 띄우지 않습니다. 수동 "업데이트 확인" 은 항상 결과를 알려 줍니다.
+- **릴리스 노트:** 새 버전 알림은 노트 원문(마크다운, 설치 안내)을 그대로 보이지 않고 `ReleaseNotesSummary` 로 뽑은 변경 항목(최대 6개 + "외 N건")만 글머리표로 보입니다.
+  [릴리스 노트 보기] 는 창을 닫지 않고 `releaseUrl`(없으면 `repositoryUrl/releases/tag/<tag>`)을 브라우저로 엽니다.
+  이 기능은 `updater-v0.2.0` 부터 있습니다 — 이미 쓰는 앱은 `ref` 를 올리고 `lib/update/update_dialogs.dart` · `update_service.dart` 와 ARB 의 `updateMoreChanges` · `updateViewReleaseNotes` 를 새 템플릿대로 맞춥니다.
 
 ## 검증
 

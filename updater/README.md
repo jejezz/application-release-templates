@@ -23,6 +23,10 @@ if (r is UpdateAvailable) {
 - `checkAutomatically(UpdatePolicy)` — 앱 시작용. 24시간에 한 번, 건너뛴 버전은 알리지 않고, 실패는 조용히 넘깁니다. 수동 "업데이트 확인" 은 `check()`.
 - 서버는 `https` 만 (루프백 http 는 시험용). 다운로드 URL 은 `https://github.com/` 로 시작해야 합니다.
 - 체크섬이 없으면 `UpdateUnavailable(noChecksum)` — **자동 설치 금지**, `releaseUrl` 만 안내합니다.
+- `ReleaseNotesSummary.from(info.notes)` — GitHub 릴리스 노트(마크다운 · 설치 안내 헤더 포함)에서 사용자에게 보일 변경 항목만 뽑습니다.
+  구분선(`---`)·`**Full Changelog**` 아래와 "New Contributors" 는 버리고, 목록 항목의 `by @… in <PR>` 와 Conventional Commits 접두어를 떼며,
+  `chore`·`ci`·`build`·`docs`·`test`·`style`·`refactor` 는 뺍니다. 기본 6개까지, 나머지는 `more` 개수. 전문은 `releaseUrl` 로 안내합니다.
+  (Avalonia 앱 `daylight-commander-avalonia` 의 `ReleaseNotesSummary.From` 이 같은 규칙입니다.)
 
 ## 시험
 
@@ -35,7 +39,7 @@ dart run tool/live_check.dart https://<서버>/repos portside-flutter 0.1.0   # 
 
 ## 상태
 
-- ✅ 버전 비교 · `check` · `download` · 정책(`UpdatePolicy`) · OS 별 installer · 시험 42건
+- ✅ 버전 비교 · `check` · `download` · 정책(`UpdatePolicy`) · OS 별 installer · 릴리스 노트 요약 · 시험 52건
 - ✅ UI 템플릿 (`common/lib/update/`) · ARB 문구 · 정보 창 / macOS 메뉴 연결 · 위젯 시험 (`../common/README.md` '업데이트' 절)
 - ⬜ 실제 Windows · Linux 기기에서의 확인 (아래)
 

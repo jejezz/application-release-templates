@@ -9,4 +9,5 @@ export 'src/installers.dart';
 export 'src/models.dart';
 export 'src/platform.dart';
 export 'src/policy.dart';
+export 'src/release_notes.dart';
 export 'src/version.dart';
