@@ -49,6 +49,13 @@
 삼고, CI는 거기서 읽습니다 (dove-zip이 이미 이렇게 합니다). `pubspec.yaml`의
 `name:`은 snake_case라서 표시 이름으로 쓰면 안 됩니다.
 
+**Avalonia 앱**은 표시 이름의 원본이 `Directory.Build.props`의 `AppDisplayName`이고,
+코드는 `AppIdentity.DisplayName`으로 읽습니다. 이 값을 `Application.Name`에도 넣습니다
+(`App.Initialize`에서 `Name = AppIdentity.DisplayName;`). macOS 메뉴 막대의 앱 메뉴
+제목과 "… 숨기기"·"… 종료" 항목은 `Info.plist`의 `CFBundleName`이 아니라
+`Application.Name`을 쓰므로, 빠뜨리면 Avalonia 기본값 **"Avalonia Application"** 이
+보입니다. (2026-11: daylight-compare·daylight-commander·jacksbean-avalonia에서 고침)
+
 ### 3. 식별자
 
 - 형식: `<접두어>.<패키지명에서 _ 뺀 소문자>`, 예: `art.zoomon.dovezip`
