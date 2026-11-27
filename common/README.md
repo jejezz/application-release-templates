@@ -110,7 +110,10 @@
 - **`app` 이름**은 `AppIdentity.repositoryUrl` 의 마지막 경로(저장소 이름)입니다 — 따로 적을 것이 없습니다.
 - 릴리스에 `SHA256SUMS.txt` 가 없거나 파일 이름이 [packaging.md](../conventions/packaging.md) §1 을 따르지 않으면 서버가 자동 설치를 막고 "릴리스 페이지에서 받기" 로 안내합니다.
 - **macOS 샌드박스:** 규약 앱은 `com.apple.security.app-sandbox = false` 입니다 (portside · dove-zip). `flutter create` 의 기본(샌드박스 켜짐, 네트워크 권한 없음)을 그대로 쓰면 업데이트 확인이 연결되지 않습니다 — 샌드박스를 켠 채로 둔다면 `com.apple.security.network.client` 가 필요하고, DMG 열기(`open`)는 따로 확인해야 합니다.
-- 종료는 정식 종료(`exitApplication(cancelable)`)라 앱의 `didRequestAppExit` 를 거칩니다 — 종료 직전에 할 정리(로그 flush · 저장)는 거기에 둡니다. 다르게 하려면 `UpdateService.create()` 대신 직접 만들어 `quitApp` 을 넘깁니다.
+- "종료하고 설치" 는 먼저 앱의 `didRequestAppExit` 를 거칩니다 — 종료 직전에 할 정리(로그 flush · 저장 · 저장 안 한 편집 묻기)는 거기에 둡니다. `cancel` 을 돌려주면 끝내지 않습니다.
+  - **Windows** 는 그 뒤 `exit(0)` 으로 바로 끝냅니다. `exitApplication` 은 엔진이 스스로 내려가는 동안 창이 멈춘 채 9–13초 남았기 때문입니다 (daylight-broom 측정). macOS · Linux 는 정식 종료(`exitApplication(cancelable)`)를 그대로 씁니다.
+  - **트레이 상주 앱**은 `UpdateService.create(quitApp: ...)` 에 자기 종료 함수(트레이 아이콘 제거 → 백그라운드 일 정지 → `exit(0)`)를 넘깁니다. 트레이 메뉴의 "종료" 도 같은 함수를 씁니다 — `windowManager.destroy()` 도 같은 이유로 Windows 에서 느립니다.
+  - 이미 쓰는 앱은 `lib/update/update_service.dart` 를 새 템플릿대로 맞춥니다.
 - **프리릴리스 버전 함정 (첫 태그 `v0.1.0-rc.1`):** macOS 는 Info.plist 에 숫자만 허용해서 `0.1.0-rc.1+1` 이 `0.1.0.1` 로 들어가고, `PackageInfo.version` 도 그 값이라 `AppUpdater` 가 `ArgumentError: currentVersion: not a version` 을 던진다. `main()` 이 `UpdateService.create()` 를 `runApp` 앞에서 기다리면 **앱이 시작하지 못해 창이 검게 남는다.** 템플릿은 두 겹으로 막는다:
   - `create()` 는 **절대 던지지 않는다** — 버전을 읽을 수 없으면 null(업데이트 확인 끔). 그래서 `main.dart` 에 try/catch 를 따로 둘 필요가 없다.
   - 정확한 버전은 릴리스 워크플로가 태그에서 `--dart-define=APP_VERSION=<버전>` 으로 넣는다 (`desktop/.github/workflows/release.yml`). 없으면 `x.y.z.n` 을 `x.y.z-rc.n` 으로 본다 (규약의 프리릴리스는 rc 뿐). 로컬 `flutter run` 은 define 없이도 이 대체 규칙으로 돈다.
